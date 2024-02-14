@@ -1,21 +1,21 @@
-# MultiversX IDE for Visual Studio Code
+# KleverChain IDE for Visual Studio Code
 
-![Build Status](https://github.com/multiversx/mx-ide-vscode/actions/workflows/build.yml/badge.svg)
+![Build Status](https://github.com/klever-io/kvm-ide-vscode/actions/workflows/build.yml/badge.svg)
 
 ## What is it?
 
-**MultiversX IDE** is an extension for Visual Studio Code that offers development support for MultiversX Smart Contracts written in Rust.
+**KleverChain IDE** is an extension for Visual Studio Code that offers development support for KleverChain Smart Contracts written in Rust.
 
 ## Main features
 
  - Build Smart Contracts to WASM
  - Step-by-step debugging Rust smart contracts
  - Automatically download tools and dependencies
- - Rust debugger support for managed types - see [the installation guide](#installing-the-rust-debugger-pretty-printer-script)
+ <!-- - Rust debugger support for managed types - see [the installation guide](#installing-the-rust-debugger-pretty-printer-script) -->
 
 ## How to get it
 
-MultiversX IDE can be installed from the Visual Studio Code Marketplace.
+KleverChain IDE can be installed from the Visual Studio Code Marketplace.
 
 ## Requirements and dependencies
 
@@ -25,15 +25,15 @@ MultiversX IDE can be installed from the Visual Studio Code Marketplace.
  - **Windows** is not supported yet
  - **MacOS** is supported
 
-If you experience any issues, please let us know [on Github](https://github.com/multiversx/mx-ide-vscode/issues), on [Discord](http://discord.gg/MultiversXBuilders) or [on Telegram](https://t.me/MultiversXDevelopers).
+If you experience any issues, please let us know [on Github](https://github.com/klever-io/kvm-ide-vscode/issues), on [Discord](http://discord.gg/klever_io) or [on Telegram](https://t.me/klever_io).
 
-### [mxpy](https://github.com/multiversx/mx-sdk-py-cli)
+### [ksc](https://github.com/klever-io/klever-vm-sdk-rs)
 
-**mxpy** is the backend of the Visual Studio Code extension. **mxpy** is **required** by the MultiversX IDE. In order to install it, please follow [these steps](https://docs.multiversx.com/sdk-and-tools/sdk-py/installing-mxpy).
+**ksc** is the backend of the Visual Studio Code extension. **ksc** is **required** by the KleverChain IDE. In order to install it, please follow [these steps](https://docs.klever.org).
 
 ### Other dependencies
 
-The extension, via `mxpy`, will automatically download its external dependencies, so you do not have to worry much about setting up the development environment. These automatically installed dependencies include:
+The extension, via `ksc`, will automatically download its external dependencies, so you do not have to worry much about setting up the development environment. These automatically installed dependencies include:
 
 * `RUST` buildchain
 * `VM Tools` (e.g. tests / scenarios framework)
@@ -44,18 +44,19 @@ This extension contributes the following commands (`Ctrl+Shift+P`):
 
 * `newFromTemplate`
 * `buildContract`
+* `deployContract`
 * `cleanContract`
 * `runScenarios`
 
-## Installing the rust debugger pretty printer script
+<!-- ## Installing the rust debugger pretty printer script
 
 The rust debugger pretty printer script for LLDB allows proper viewing of managed types (BigUint, ManagedBuffer etc.) when debugging smart contract rust tests.
 
 Prerequisites: First, make sure that the [CodeLLDB](https://github.com/vadimcn/vscode-lldb) extension is installed. This can be done directly from Visual Studio Code extensions menu.
 
-Then, from Visual Studio Code open the command menu via `Ctrl+Shift+P` and run `MultiversX: Install the rust debugger pretty printer script`. If this option isn't present, make sure you have the latest version of the `MultiversX` Visual Studio Code extension.
+Then, from Visual Studio Code open the command menu via `Ctrl+Shift+P` and run `KleverChain: Install the rust debugger pretty printer script`. If this option isn't present, make sure you have the latest version of the `KleverChain` Visual Studio Code extension.
 
-You will be prompted for the repository, branch and path for the pretty printer script. Simply leave the options blank in order to install the latest version of the script from mx-sdk-rs.
+You will be prompted for the repository, branch and path for the pretty printer script. Simply leave the options blank in order to install the latest version of the script from mx-sdk-rs. -->
 
 ## Contributors
 

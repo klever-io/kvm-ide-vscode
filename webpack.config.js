@@ -4,7 +4,7 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const copyPlugin = require("copy-webpack-plugin");
+const copyPlugin = require('copy-webpack-plugin');
 
 const defaultModuleRules = [
     {
@@ -12,21 +12,21 @@ const defaultModuleRules = [
         exclude: /node_modules/,
         use: [
             {
-                loader: 'ts-loader'
-            }
-        ]
+                loader: 'ts-loader',
+            },
+        ],
     },
     {
         test: /\.html$/i,
-        loader: "html-loader",
+        loader: 'html-loader',
         options: {
             esModule: false,
         },
-    }
+    },
 ];
 
 // For debbuging, use "inline-source-map".
-const devTool = "source-map";
+const devTool = 'inline-source-map';
 
 /**@type {import('webpack').Configuration}*/
 const extensionConfig = {
@@ -39,11 +39,11 @@ const extensionConfig = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'extension.js',
         libraryTarget: 'commonjs2',
-        devtoolModuleFilenameTemplate: '../[resource-path]'
+        devtoolModuleFilenameTemplate: '../[resource-path]',
     },
     devtool: devTool,
     externals: {
-        vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+        vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     },
     resolve: {
         // support reading TypeScript and JavaScript files, 📖 -> https://github.com/TypeStrong/ts-loader
@@ -56,31 +56,31 @@ const extensionConfig = {
             // Webpack 5 no longer polyfills Node.js core modules automatically.
             // see https://webpack.js.org/configuration/resolve/#resolvefallback
             // for the list of Node.js core module polyfills.
-        }
+        },
     },
     module: {
-        rules: defaultModuleRules
+        rules: defaultModuleRules,
     },
     plugins: [
         new webpack.ProvidePlugin({
-            "window": path.resolve(path.join(__dirname, 'src/polyfills/window')),
+            window: path.resolve(path.join(__dirname, 'src/polyfills/window')),
         }),
         new copyPlugin({
             patterns: [
                 {
-                    from: path.resolve(path.join(__dirname, "node_modules/@vscode/codicons/dist/codicon.css")),
-                    to: path.resolve(path.join(__dirname, "content/codicons/")),
+                    from: path.resolve(path.join(__dirname, 'node_modules/@vscode/codicons/dist/codicon.css')),
+                    to: path.resolve(path.join(__dirname, 'content/codicons/')),
                 },
                 {
-                    from: path.resolve(path.join(__dirname, "node_modules/@vscode/codicons/dist/codicon.ttf")),
-                    to: path.resolve(path.join(__dirname, "content/codicons/")),
+                    from: path.resolve(path.join(__dirname, 'node_modules/@vscode/codicons/dist/codicon.ttf')),
+                    to: path.resolve(path.join(__dirname, 'content/codicons/')),
                 },
                 {
-                    from: path.resolve(path.join(__dirname, "node_modules/@vscode/codicons/LICENSE")),
-                    to: path.resolve(path.join(__dirname, "content/codicons/")),
-                }
-            ]
-        })
+                    from: path.resolve(path.join(__dirname, 'node_modules/@vscode/codicons/LICENSE')),
+                    to: path.resolve(path.join(__dirname, 'content/codicons/')),
+                },
+            ],
+        }),
     ],
 };
 
@@ -90,7 +90,7 @@ const extensionConfig = {
 function createWebviewConfig(options) {
     /**@type {import('webpack').Configuration}*/
     const webViewConfig = {
-        target: ["web", "es2020"],
+        target: ['web', 'es2020'],
 
         entry: options.entry,
         // https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/780dd005b820c00340fe72a76a50099c5d0ef952/default/hello-world-webpack/webpack.config.js
@@ -98,12 +98,12 @@ function createWebviewConfig(options) {
         output: {
             path: path.resolve(__dirname, 'dist'),
             filename: options.outputName,
-            libraryTarget: "module",
-            chunkFormat: "module"
+            libraryTarget: 'module',
+            chunkFormat: 'module',
         },
         devtool: devTool,
         externals: {
-            vscode: 'commonjs vscode' // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+            vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
         },
         resolve: {
             mainFields: ['browser', 'module', 'main'],
@@ -115,16 +115,14 @@ function createWebviewConfig(options) {
                 // Webpack 5 no longer polyfills Node.js core modules automatically.
                 // see https://webpack.js.org/configuration/resolve/#resolvefallback
                 // for the list of Node.js core module polyfills.
-            }
+            },
         },
         module: {
-            rules: defaultModuleRules
-        }
+            rules: defaultModuleRules,
+        },
     };
 
     return webViewConfig;
 }
 
-module.exports = [
-    extensionConfig
-];
+module.exports = [extensionConfig];

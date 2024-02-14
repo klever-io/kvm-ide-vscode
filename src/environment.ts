@@ -4,9 +4,14 @@ import { Settings } from "./settings";
 export class Environment {
     static getForTerminal(): any {
         let sdkPath = path.join("${env:HOME}", Settings.getSdkPathRelativeToHome());
-        let vmToolsFolder = path.join(sdkPath, "vmtools");
+        let koperatorFolder = path.join(sdkPath, "koperator");
         return {
-            "PATH": `${sdkPath}:${vmToolsFolder}:${process.env["PATH"]}`
+            PATH: `${sdkPath}:${koperatorFolder}:${process.env["PATH"]}`,
         };
+    }
+
+    static getNode(): string {
+        console.log("TEST saporraaaaa");
+        return process.env["KLEVER_NODE"] || "https://node.devnet.klever.finance";
     }
 }

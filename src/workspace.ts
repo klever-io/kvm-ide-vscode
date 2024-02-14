@@ -31,7 +31,7 @@ export async function setup() {
 }
 
 function ensureWorkspaceDefinitionFile() {
-    const filePath = path.join(getPath(), "multiversx.workspace.json");
+    const filePath = path.join(getPath(), "kleverchain.workspace.json");
     if (!fs.existsSync(filePath)) {
         fs.writeFileSync(filePath, "{}");
     }
@@ -39,17 +39,17 @@ function ensureWorkspaceDefinitionFile() {
 
 export function getLanguages(): string[] {
     const metadataObjects = getMetadataObjects();
-    const languagesInProject = metadataObjects.map(item => item.Language);
+    const languagesInProject = metadataObjects.map((item) => item.Language);
     const set = new Set(languagesInProject);
     return [...set.values()];
 }
 
 export function getMetadataObjects(): ProjectMetadata[] {
-    let pattern = `${getPath()}/**/multiversx.json`;
+    let pattern = `${getPath()}/**/kleverkapp.json`;
     let paths = glob.sync(pattern, {});
     let result: ProjectMetadata[] = [];
 
-    paths.forEach(item => {
+    paths.forEach((item) => {
         try {
             result.push(new ProjectMetadata(item));
         } catch (error) {
@@ -61,7 +61,7 @@ export function getMetadataObjects(): ProjectMetadata[] {
 }
 
 export function getMetadataObjectByFolder(folder: string): ProjectMetadata {
-    const metadataPath = path.join(folder, "multiversx.json");
+    const metadataPath = path.join(folder, "kleverkapp.json");
     return new ProjectMetadata(metadataPath);
 }
 
@@ -87,4 +87,3 @@ export class ProjectMetadata {
         }
     }
 }
-

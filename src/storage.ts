@@ -7,7 +7,7 @@ export function getPathTo(fileName: string): string {
 }
 
 function getPath(): string {
-    let storagePath = Root.ExtensionContext.storagePath;
+    let storagePath = Root.ExtensionContext.storageUri.fsPath;
     if (!fs.existsSync(storagePath)) {
         fs.mkdirSync(storagePath);
     }

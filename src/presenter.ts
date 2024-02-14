@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
-import { FreeTextVersion, Version } from './version';
+import * as vscode from "vscode";
+import { FreeTextVersion, Version } from "./version";
 
 export async function askOpenWorkspace() {
     const message = "No folder open in your workspace. Please open a folder.";
@@ -23,29 +23,30 @@ export async function askContractName() {
         value: "",
         ignoreFocusOut: true,
         placeHolder: "For example: mycontract",
-        validateInput: text => {
+        validateInput: (text) => {
             return text.length > 0 ? null : "Should not be empty.";
-        }
+        },
     });
 
     return result;
 }
 
-export async function askInstallMxpy(requiredVersion: Version): Promise<boolean> {
-    let answer = await askYesNo(`MultiversX IDE requires mxpy ${requiredVersion}, which isn't available in your environment.
+export async function askInstallKsc(requiredVersion: Version): Promise<boolean> {
+    let answer =
+        await askYesNo(`KleverChain IDE requires ksc ${requiredVersion}, which isn't available in your environment.
 Do you agree to install it?`);
     return answer;
 }
 
-export async function askMxpyVersion(defaultVersion: Version): Promise<Version> {
+export async function askKscVersion(defaultVersion: Version): Promise<Version> {
     const result = await vscode.window.showInputBox({
-        prompt: "Enter the mxpy version to install",
+        prompt: "Enter the ksc version to install",
         value: defaultVersion.toString(),
         ignoreFocusOut: true,
         placeHolder: "For example: 5.6.7",
-        validateInput: text => {
+        validateInput: (text) => {
             return text.length > 0 ? null : "Should not be empty.";
-        }
+        },
     });
 
     if (result === undefined) {
@@ -55,32 +56,29 @@ export async function askMxpyVersion(defaultVersion: Version): Promise<Version> 
     return Version.parse(result);
 }
 
-export async function askInstallMxpyGroup(group: string): Promise<boolean> {
-    let answer = await askYesNo(`It seems that your workspace requires the dependency group "${group}", which isn't available in your environment.
-Do you agree to install it?`);
+export async function askInstallKoperator(requiredVersion: Version): Promise<boolean> {
+    let answer =
+        await askYesNo(`KleverChain IDE requires koperator ${requiredVersion}, which isn't available in your environment.
+    Do you agree to install it?`);
     return answer;
 }
 
-export async function askChooseSdkModule(modules: string[]): Promise<string> {
-    return await askChoice(modules);
-}
-
-export async function askModuleVersion(): Promise<FreeTextVersion> {
+export async function askKoperatorVersion(defaultVersion: Version): Promise<Version> {
     const result = await vscode.window.showInputBox({
-        prompt: "Enter the module version to install (leave blank for default)",
-        value: "",
+        prompt: "Enter the koperator version to install",
+        value: defaultVersion.toString(),
         ignoreFocusOut: true,
-        placeHolder: "For example: v1.2.3"
+        placeHolder: "For example: 5.6.7",
+        validateInput: (text) => {
+            return text.length > 0 ? null : "Should not be empty.";
+        },
     });
 
     if (result === undefined) {
         return null;
     }
-    if (result == "") {
-        return FreeTextVersion.unspecified();
-    }
 
-    return new FreeTextVersion(result);
+    return Version.parse(result);
 }
 
 export async function askYesNo(question: string): Promise<boolean> {
@@ -95,5 +93,7 @@ export async function askChoice(choices: string[]): Promise<string> {
 }
 
 export async function askChoiceTyped<T extends vscode.QuickPickItem>(choices: T[]): Promise<T> {
-    return await vscode.window.showQuickPick<T>(choices, { ignoreFocusOut: true });
+    return await vscode.window.showQuickPick<T>(choices, {
+        ignoreFocusOut: true,
+    });
 }

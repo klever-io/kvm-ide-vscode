@@ -11,7 +11,20 @@ export class Settings {
         return Settings.getSdkPath().replace(os.homedir, "");
     }
 
+    public static getNode(): string {
+        return this.getConfiguration().get<string>("kleverNode");
+    }
+
+    public static getAddress(): string {
+        return this.getConfiguration().get<string>("address");
+    }
+
+    public static getKeyFile(): string {
+        const folder = this.getConfiguration().get<string>("keyFile");
+        return folder.replace("~", os.homedir);
+    }
+
     private static getConfiguration(): vscode.WorkspaceConfiguration {
-        return vscode.workspace.getConfiguration("multiversx");
+        return vscode.workspace.getConfiguration("kleverchain");
     }
 }

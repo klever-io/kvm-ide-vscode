@@ -1,14 +1,14 @@
-import * as vscode from 'vscode';
-import { withoutEndingPeriod } from './text';
+import * as vscode from "vscode";
+import { withoutEndingPeriod } from "./text";
 
 /**
  * Utility class for writing messages to the console and to a VSCode "output channel".
  * Optionally, messages are also displayed to the user, as simple VSCode notifications or as modal dialogs.
  */
 export class Feedback {
-    private static outputChannels: { [id: string]: vscode.OutputChannel; } = {};
+    private static outputChannels: { [id: string]: vscode.OutputChannel } = {};
 
-    public static async debug(options: { message: string, items?: any[] }) {
+    public static async debug(options: { message: string; items?: any[] }) {
         const items = options.items || [];
 
         console.debug(options.message, ...items);
@@ -17,7 +17,7 @@ export class Feedback {
         this.writeArbitraryItems(items);
     }
 
-    public static async info(options: { message: string, items?: any[], display?: boolean, modal?: boolean }) {
+    public static async info(options: { message: string; items?: any[]; display?: boolean; modal?: boolean }) {
         const items = options.items || [];
 
         console.info(options.message, ...items);
@@ -26,11 +26,13 @@ export class Feedback {
         this.writeArbitraryItems(items);
 
         if (options.display) {
-            await vscode.window.showInformationMessage(options.message, { modal: options.modal || false });
+            await vscode.window.showInformationMessage(options.message, {
+                modal: options.modal || false,
+            });
         }
     }
 
-    public static async error(options: { message: string, error: any, items?: any[], display?: boolean }) {
+    public static async error(options: { message: string; error: any; items?: any[]; display?: boolean }) {
         const items = options.items || [];
 
         console.error(options.message, options.error, ...items);
@@ -41,7 +43,7 @@ export class Feedback {
         if (options.display) {
             const message = `
 ${withoutEndingPeriod(options.message)}.
-To see more details, pick "MultiversX" in vscode's "Output" panels.
+To see more details, pick "kleverchain" in vscode's "Output" panels.
 `;
             const messageOptions: vscode.MessageOptions = {};
             await vscode.window.showErrorMessage(message, messageOptions, "Got it!");
@@ -54,7 +56,7 @@ To see more details, pick "MultiversX" in vscode's "Output" panels.
     }
 
     private static getChannel(): vscode.OutputChannel {
-        const channelName = `MultiversX`;
+        const channelName = `KleverChain`;
 
         if (!this.outputChannels[channelName]) {
             this.outputChannels[channelName] = vscode.window.createOutputChannel(channelName);

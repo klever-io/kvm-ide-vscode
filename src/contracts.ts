@@ -4,11 +4,12 @@ import * as workspace from "./workspace";
 import path = require("path");
 
 export class SmartContractsViewModel implements vscode.TreeDataProvider<SmartContract> {
-    private _onDidChangeTreeData: vscode.EventEmitter<SmartContract | undefined> = new vscode.EventEmitter<SmartContract | undefined>();
+    private _onDidChangeTreeData: vscode.EventEmitter<SmartContract | undefined> = new vscode.EventEmitter<
+        SmartContract | undefined
+    >();
     readonly onDidChangeTreeData?: vscode.Event<SmartContract> = this._onDidChangeTreeData.event;
 
-    constructor() {
-    }
+    constructor() {}
 
     async refresh() {
         if (!workspace.isOpen()) {
@@ -32,7 +33,7 @@ export class SmartContractsViewModel implements vscode.TreeDataProvider<SmartCon
         }
 
         const metadataObjects = workspace.getMetadataObjects();
-        const contracts = metadataObjects.map(metadata => new SmartContract(metadata));
+        const contracts = metadataObjects.map((metadata) => new SmartContract(metadata));
         return contracts;
     }
 }
@@ -64,7 +65,7 @@ export class SmartContract {
         let contentPath = path.join(__filename, "..", "..", "content");
         return {
             light: path.join(contentPath, "light", `lang-${language}.png`),
-            dark: path.join(contentPath, "dark", `lang-${language}.png`)
+            dark: path.join(contentPath, "dark", `lang-${language}.png`),
         };
     }
 }

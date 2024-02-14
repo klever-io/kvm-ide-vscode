@@ -15,7 +15,7 @@ export class Version {
     }
 
     static parse(versionString: string) {
-        // Handle input such as "mxpy v1.2.3".
+        // Handle input such as "ksc v1.2.3".
         const tokens = versionString.trim().split(" ");
         const version = tokens[tokens.length - 1].trim();
         // Handle both semver and PEP440 (at least, partially).

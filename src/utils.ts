@@ -1,7 +1,7 @@
-import child_process = require('child_process');
-import fs = require('fs');
-import path = require('path');
-import { Feedback } from './feedback';
+import child_process = require("child_process");
+import fs = require("fs");
+import path = require("path");
+import { Feedback } from "./feedback";
 
 export class ProcessFacade {
     public static execute(options: any): Promise<any> {
@@ -30,8 +30,8 @@ export class ProcessFacade {
         let latestStdout = "";
         let collectedStdout = "";
         let latestStderr = "";
-        subprocess.stdout.setEncoding('utf8');
-        subprocess.stderr.setEncoding('utf8');
+        subprocess.stdout.setEncoding("utf8");
+        subprocess.stderr.setEncoding("utf8");
 
         if (stdoutToFile) {
             let writeStream: fs.WriteStream = fs.createWriteStream(stdoutToFile);
@@ -47,7 +47,7 @@ export class ProcessFacade {
 
             Feedback.debug({
                 message: `stderr of ${programName}`,
-                items: [data]
+                items: [data],
             });
         });
 
@@ -61,7 +61,9 @@ export class ProcessFacade {
             if (code === 0) {
                 resolve({ code: code, stdout: stdout });
             } else {
-                reject(new Error(`${programName} exited with code = ${code}.`, { cause: latestStderr || latestStdout }));
+                reject(
+                    new Error(`${programName} exited with code = ${code}.`, { cause: latestStderr || latestStdout })
+                );
             }
         });
 
@@ -70,5 +72,5 @@ export class ProcessFacade {
 }
 
 export async function sleep(milliseconds: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }

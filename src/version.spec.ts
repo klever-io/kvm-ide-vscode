@@ -1,5 +1,5 @@
-import { assert } from 'chai';
-import { Version } from './version';
+import { assert } from "chai";
+import { Version } from "./version";
 
 describe("test version", () => {
     it("should initialize properly", () => {

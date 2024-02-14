@@ -10,6 +10,6 @@ export async function onTopLevelError(error: any): Promise<void> {
     await Feedback.error({
         message: error.message,
         error: error,
-        display: true
+        display: true,
     });
 }
