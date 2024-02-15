@@ -30,6 +30,14 @@ export async function setup() {
     ensureWorkspaceDefinitionFile();
 }
 
+export function isWorkspaceSetup(): boolean {
+    const filePath = path.join(getPath(), "kleverchain.workspace.json");
+    if (!fs.existsSync(filePath)) {
+        return false;
+    }
+    return true;
+}
+
 function ensureWorkspaceDefinitionFile() {
     const filePath = path.join(getPath(), "kleverchain.workspace.json");
     if (!fs.existsSync(filePath)) {

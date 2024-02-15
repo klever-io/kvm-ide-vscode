@@ -45,6 +45,11 @@ export async function activate(context: vscode.ExtensionContext) {
         "kleverchain.refreshContracts",
         async () => await refreshViewModel(contractsViewModel)
     );
+
+    const isWorkspaceSetup = workspace.isWorkspaceSetup();
+    if (!isWorkspaceSetup) {
+        await setupWorkspace();
+    }
 }
 
 export function deactivate() {
@@ -58,8 +63,8 @@ async function setupWorkspace() {
     }
 
     await workspace.setup();
-    await sdk.ensureInstalled();
-    await sdk.ensureKoperatorInstalled();
+
+    await Promise.all([sdk.ensureInstalled(), sdk.ensureKoperatorInstalled()]);
 
     await Feedback.info({
         message: "Workspace has been set up.",
