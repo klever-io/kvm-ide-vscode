@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ConfigurationTarget, InputBoxOptions, Terminal, Uri, window, workspace } from "vscode";
+import { ConfigurationTarget, InputBoxOptions, Terminal, Uri, window, workspace, ProgressLocation } from "vscode";
 import { Environment } from "./environment";
 import { Feedback } from "./feedback";
 import * as presenter from "./presenter";
@@ -13,6 +13,7 @@ import fs = require("fs");
 const DEFAULT_KSC_VERSION = Version.parse("0.43.3");
 const DEFAULT_KOPERATOR_VERSION = Version.parse("1.6.3");
 const LATEST_VERSIONS_URL = "https://storage.googleapis.com/kleverchain-public/versions.json";
+const BASE_STORAGE_URL = "https://storage.googleapis.com/kleverchain-public";
 
 export function getPath() {
     return Settings.getSdkPath();
@@ -126,9 +127,27 @@ async function getOneLineStdout(program: string, args: string[]): Promise<[strin
 }
 
 export async function reinstallKsc(version: Version) {
+    Feedback.info({
+        message: "Installation of ksc has been started. Please wait for installation to finish.",
+        display: true,
+    });
+
     const kscUp = storage.getPathTo("ksc");
     const kscUpUrl = getKscUpUrl(version);
-    await downloadFile(kscUp, kscUpUrl);
+    await window.withProgress(
+        {
+            location: ProgressLocation.Window,
+            cancellable: false,
+            title: "Downloading: Ksc",
+        },
+        async (progress) => {
+            progress.report({ increment: 0 });
+
+            await downloadFile(kscUp, kscUpUrl);
+
+            progress.report({ increment: 100 });
+        }
+    );
 
     const kscUpCommand = `"${kscUp}" --help`;
 
@@ -148,11 +167,6 @@ export async function reinstallKsc(version: Version) {
     // Copy the file in a cross-platform way
     await fs.promises.copyFile(kscUp, targetPath);
 
-    Feedback.info({
-        message: "ksc installation has been started. Please wait for installation to finish.",
-        display: true,
-    });
-
     do {
         Feedback.debug({
             message: "Waiting for the installer to finish.",
@@ -169,11 +183,35 @@ export async function reinstallKsc(version: Version) {
 }
 
 function getKscUpUrl(version: Version) {
-    return `https://storage.googleapis.com/kleverchain-public/ksc/${version.vValue}/ksc`;
+    switch (process.platform) {
+        case "win32":
+            return `${BASE_STORAGE_URL}/ksc/win32/${version.vValue}/ksc.exe`;
+        case "darwin":
+            if (process.arch === "arm64") {
+                return `${BASE_STORAGE_URL}/ksc/darwin-arm64/${version.vValue}/ksc`;
+            }
+            return `${BASE_STORAGE_URL}/ksc/darwin/${version.vValue}/ksc`;
+        case "linux":
+            return `${BASE_STORAGE_URL}/ksc/linux/${version.vValue}/ksc`;
+        default:
+            return `platform not supported`;
+    }
 }
 
 function getKoperatorUpUrl(version: Version) {
-    return `https://storage.googleapis.com/kleverchain-public/koperator/${version.vValue}/koperator`;
+    switch (process.platform) {
+        case "win32":
+            return `${BASE_STORAGE_URL}/koperator/win32/${version.vValue}/koperator.exe`;
+        case "darwin":
+            if (process.arch === "arm64") {
+                return `${BASE_STORAGE_URL}/koperator/darwin-arm64/${version.vValue}/koperator`;
+            }
+            return `${BASE_STORAGE_URL}/koperator/darwin/${version.vValue}/koperator`;
+        case "linux":
+            return `${BASE_STORAGE_URL}/koperator/linux/${version.vValue}/koperator`;
+        default:
+            return `platform not supported`;
+    }
 }
 
 export async function newFromTemplate(folder: string, template: string, name: string) {
@@ -216,7 +254,7 @@ async function getOrCreateTerminal(name: string, env: any, cwd: string) {
 }
 
 function findTerminal(name: string): Terminal {
-    let terminal = window.terminals.find((item) => item.name == patchTerminalName(name));
+    let terminal = window.terminals.find((item) => item.name === patchTerminalName(name));
     return terminal;
 }
 
@@ -267,7 +305,21 @@ async function reinstallKoperator(version: Version) {
 
     const koperatorUp = storage.getPathTo("koperator");
     const koperatorUpUrl = getKoperatorUpUrl(version);
-    await downloadFile(koperatorUp, koperatorUpUrl);
+
+    await window.withProgress(
+        {
+            location: ProgressLocation.Window,
+            cancellable: false,
+            title: "Downloading: Koperator",
+        },
+        async (progress) => {
+            progress.report({ increment: 0 });
+
+            await downloadFile(koperatorUp, koperatorUpUrl);
+
+            progress.report({ increment: 100 });
+        }
+    );
 
     const koperatorCommand = `"${koperatorUp}" --help`;
 
