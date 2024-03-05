@@ -78,6 +78,11 @@
                 "category": "kleverchain"
             },
             {
+                "command": "kleverchain.invokeContract",
+                "title": "Invoke Contract",
+                "category": "kleverchain"
+            },
+            {
                 "command": "kleverchain.cleanContract",
                 "title": "Clean Contract",
                 "category": "kleverchain"
@@ -127,6 +132,16 @@
                 },
                 {
                     "command": "kleverchain.deployContract",
+                    "when": "resourceFilename == kleverkapp.json",
+                    "group": "kleverchain"
+                },
+                {
+                    "command": "kleverchain.invokeContract",
+                    "when": "explorerResourceIsFolder && resourceFilename != output && resourceFilename != debug && resourceFilename != target && resourceFilename != js-snippets && resourceFilename != interaction",
+                    "group": "kleverchain"
+                },
+                {
+                    "command": "kleverchain.invokeContract",
                     "when": "resourceFilename == kleverkapp.json",
                     "group": "kleverchain"
                 },
@@ -188,6 +203,10 @@
                     "when": "false"
                 },
                 {
+                    "command": "kleverchain.invokeContract",
+                    "when": "false"
+                },
+                {
                     "command": "kleverchain.cleanContract",
                     "when": "false"
                 },
@@ -216,39 +235,43 @@
             "view/title": [
                 {
                     "command": "kleverchain.refreshTemplates",
-                    "when": "view == contractTemplates",
+                    "when": "view == kleverContractTemplates",
                     "group": "navigation"
                 },
                 {
                     "command": "kleverchain.refreshContracts",
-                    "when": "view == smartContracts",
+                    "when": "view == kleverSmartContracts",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
                     "command": "kleverchain.buildContract",
-                    "when": "view == smartContracts && viewItem == contract"
+                    "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {
                     "command": "kleverchain.deployContract",
-                    "when": "view == smartContracts && viewItem == contract"
+                    "when": "view == kleverSmartContracts && viewItem == contract"
+                },
+                {
+                    "command": "kleverchain.invokeContract",
+                    "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {
                     "command": "kleverchain.cleanContract",
-                    "when": "view == smartContracts && viewItem == contract"
+                    "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {
                     "command": "kleverchain.runScenarios",
-                    "when": "view == smartContracts && viewItem == contract"
+                    "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {
                     "command": "kleverchain.gotoContract",
-                    "when": "view == smartContracts && viewItem == contract"
+                    "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {
                     "command": "kleverchain.newFromTemplate",
-                    "when": "view == contractTemplates",
+                    "when": "view == kleverContractTemplates",
                     "group": "inline"
                 }
             ]
@@ -286,12 +309,12 @@
         "views": {
             "kleverchain": [
                 {
-                    "id": "smartContracts",
+                    "id": "kleverSmartContracts",
                     "name": "Smart Contracts",
                     "contextualTitle": "Smart Contracts in Workspace"
                 },
                 {
-                    "id": "contractTemplates",
+                    "id": "kleverContractTemplates",
                     "name": "Templates",
                     "contextualTitle": "Smart Contract Templates"
                 }
@@ -299,11 +322,11 @@
         },
         "viewsWelcome": [
             {
-                "view": "contractTemplates",
+                "view": "kleverContractTemplates",
                 "contents": "Hit the refresh button to fetch or update the available Smart Contract templates."
             },
             {
-                "view": "smartContracts",
+                "view": "kleverSmartContracts",
                 "contents": "Hit the refresh button to update the list of Smart Contracts within your workspace."
             }
         ]

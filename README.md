@@ -45,6 +45,7 @@ This extension contributes the following commands (`Ctrl+Shift+P`):
 * `newFromTemplate`
 * `buildContract`
 * `deployContract`
+* `invokeContract`
 * `cleanContract`
 * `runScenarios`
 

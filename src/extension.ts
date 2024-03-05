@@ -9,6 +9,7 @@ import * as sdk from "./sdk";
 import { ContractTemplate, TemplatesViewModel } from "./templates";
 import * as workspace from "./workspace";
 import path = require("path");
+import fs = require("fs");
 
 export async function activate(context: vscode.ExtensionContext) {
     Feedback.debug({ message: "KleverChain extension activated." });
@@ -16,9 +17,9 @@ export async function activate(context: vscode.ExtensionContext) {
     Root.ExtensionContext = context;
 
     let templatesViewModel = new TemplatesViewModel();
-    vscode.window.registerTreeDataProvider("contractTemplates", templatesViewModel);
+    vscode.window.registerTreeDataProvider("kleverContractTemplates", templatesViewModel);
     let contractsViewModel = new SmartContractsViewModel();
-    vscode.window.registerTreeDataProvider("smartContracts", contractsViewModel);
+    vscode.window.registerTreeDataProvider("kleverSmartContracts", contractsViewModel);
 
     vscode.commands.registerCommand("kleverchain.setupWorkspace", setupWorkspace);
     vscode.commands.registerCommand("kleverchain.installSdk", installSdk);
@@ -29,7 +30,13 @@ export async function activate(context: vscode.ExtensionContext) {
     );
     vscode.commands.registerCommand("kleverchain.gotoContract", gotoContract);
     vscode.commands.registerCommand("kleverchain.buildContract", buildContract);
-    vscode.commands.registerCommand("kleverchain.deployContract", deployContract);
+    vscode.commands.registerCommand("kleverchain.deployContract", (contract: any) =>
+        deployOrInvokeContract(context, "deploy", contract)
+    );
+    vscode.commands.registerCommand("kleverchain.invokeContract", (contract: any) =>
+        deployOrInvokeContract(context, "invoke", contract)
+    );
+
     vscode.commands.registerCommand("kleverchain.runScenarios", runScenarios);
     vscode.commands.registerCommand("kleverchain.runFreshLocalnet", runFreshLocalnet);
     vscode.commands.registerCommand("kleverchain.resumeExistingLocalnet", resumeExistingLocalnet);
@@ -136,10 +143,10 @@ async function buildContract(contract: any) {
     }
 }
 
-async function deployContract(contract: any) {
+async function deployOrInvokeContract(context: any, type: string, contract: any) {
     try {
         let folder = getContractFolder(contract);
-        await sdk.deployContract(folder);
+        await sdk.deployOrInvokeContract(context, type, folder);
     } catch (error) {
         await onTopLevelError(error);
     }
