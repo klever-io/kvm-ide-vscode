@@ -83,6 +83,11 @@
                 "category": "kleverchain"
             },
             {
+                "command": "kleverchain.upgradeContract",
+                "title": "Upgrade Contract",
+                "category": "kleverchain"
+            },
+            {
                 "command": "kleverchain.cleanContract",
                 "title": "Clean Contract",
                 "category": "kleverchain"
@@ -142,6 +147,16 @@
                 },
                 {
                     "command": "kleverchain.invokeContract",
+                    "when": "resourceFilename == kleverkapp.json",
+                    "group": "kleverchain"
+                },
+                {
+                    "command": "kleverchain.upgradeContract",
+                    "when": "explorerResourceIsFolder && resourceFilename != output && resourceFilename != debug && resourceFilename != target && resourceFilename != js-snippets && resourceFilename != interaction",
+                    "group": "kleverchain"
+                },
+                {
+                    "command": "kleverchain.upgradeContract",
                     "when": "resourceFilename == kleverkapp.json",
                     "group": "kleverchain"
                 },
@@ -207,6 +222,10 @@
                     "when": "false"
                 },
                 {
+                    "command": "kleverchain.upgradeContract",
+                    "when": "false"
+                },
+                {
                     "command": "kleverchain.cleanContract",
                     "when": "false"
                 },
@@ -255,6 +274,10 @@
                 },
                 {
                     "command": "kleverchain.invokeContract",
+                    "when": "view == kleverSmartContracts && viewItem == contract"
+                },
+                {
+                    "command": "kleverchain.upgradeContract",
                     "when": "view == kleverSmartContracts && viewItem == contract"
                 },
                 {

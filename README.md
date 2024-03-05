@@ -46,6 +46,7 @@ This extension contributes the following commands (`Ctrl+Shift+P`):
 * `buildContract`
 * `deployContract`
 * `invokeContract`
+* `upgradeContract`
 * `cleanContract`
 * `runScenarios`
 

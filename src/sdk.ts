@@ -394,7 +394,7 @@ export async function buildContract(folder: string) {
     }
 }
 
-export async function deployOrInvokeContract(context: any, type: string, folder: string) {
+export async function manageContract(context: any, type: string, folder: string) {
     try {
         const panel = vscode.window.createWebviewPanel(
             "manageContract", // Identifies the type of the webview. Used internally
@@ -436,6 +436,7 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                     });
                 } else if (message.command === "submitForm") {
                     if (message?.data?.scType === 1) {
+                        //Deploy
                         const metadata: string[] = message.metadata.split("@");
 
                         if (metadata.length < 3) {
@@ -452,7 +453,7 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                         let propertiesFlags = getPropertiesFlags(metadata[2]);
 
                         let callValue = "";
-                        if (message.data.callValue) {
+                        if (message?.data?.callValue) {
                             for (const key in message.data.callValue) {
                                 callValue += `--values ${key}=${message.data.callValue[key]} `;
                             }
@@ -470,6 +471,7 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                             },
                         });
                     } else if (message?.data?.scType === 0) {
+                        //Invoke
                         let callValue = "";
                         if (message?.data?.callValue) {
                             for (const key in message.data.callValue) {
@@ -481,6 +483,43 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                             `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
                             } ${message?.metadata} ${callValue} --await`,
+                            true
+                        );
+
+                        panel.webview.postMessage({
+                            command: "txResult",
+                            data: {
+                                result,
+                            },
+                        });
+                    } else if (message?.data?.scType === 2) {
+                        //Upgrade
+                        const metadata: string[] = message.metadata.split("@");
+
+                        if (metadata.length < 3) {
+                            throw new Error("Invalid metadata");
+                        }
+
+                        let customMetadata = "";
+                        if (metadata.length > 3) {
+                            //discard binary blob, vmType and properties as it will be loaded automatically from the file by the koperator
+                            customMetadata = metadata.slice(3).join("@");
+                            customMetadata = "@" + customMetadata;
+                        }
+
+                        let propertiesFlags = getPropertiesFlags(metadata[2]);
+
+                        let callValue = "";
+                        if (message?.data?.callValue) {
+                            for (const key in message.data.callValue) {
+                                callValue += `--values ${key}=${message.data.callValue[key]} `;
+                            }
+                        }
+
+                        const result = await Feedback.runCommandAndCaptureOutput(
+                            `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
+                                message?.data?.address
+                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
                         );
 

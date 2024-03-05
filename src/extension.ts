@@ -31,10 +31,13 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("kleverchain.gotoContract", gotoContract);
     vscode.commands.registerCommand("kleverchain.buildContract", buildContract);
     vscode.commands.registerCommand("kleverchain.deployContract", (contract: any) =>
-        deployOrInvokeContract(context, "deploy", contract)
+        manageContract(context, "deploy", contract)
     );
     vscode.commands.registerCommand("kleverchain.invokeContract", (contract: any) =>
-        deployOrInvokeContract(context, "invoke", contract)
+        manageContract(context, "invoke", contract)
+    );
+    vscode.commands.registerCommand("kleverchain.upgradeContract", (contract: any) =>
+        manageContract(context, "upgrade", contract)
     );
 
     vscode.commands.registerCommand("kleverchain.runScenarios", runScenarios);
@@ -143,10 +146,10 @@ async function buildContract(contract: any) {
     }
 }
 
-async function deployOrInvokeContract(context: any, type: string, contract: any) {
+async function manageContract(context: any, type: string, contract: any) {
     try {
         let folder = getContractFolder(contract);
-        await sdk.deployOrInvokeContract(context, type, folder);
+        await sdk.manageContract(context, type, folder);
     } catch (error) {
         await onTopLevelError(error);
     }
