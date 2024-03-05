@@ -435,7 +435,7 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                         },
                     });
                 } else if (message.command === "submitForm") {
-                    if (type === "deploy") {
+                    if (message?.data?.scType === 1) {
                         const metadata: string[] = message.metadata.split("@");
 
                         if (metadata.length < 3) {
@@ -469,7 +469,7 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                                 result,
                             },
                         });
-                    } else if (type === "invoke") {
+                    } else if (message?.data?.scType === 0) {
                         let callValue = "";
                         if (message?.data?.callValue) {
                             for (const key in message.data.callValue) {
@@ -480,13 +480,16 @@ export async function deployOrInvokeContract(context: any, type: string, folder:
                         const result = await Feedback.runCommandAndCaptureOutput(
                             `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
-                            } ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            } ${message?.metadata} ${callValue} --await`,
                             true
                         );
-                        // await runInTerminal(
-                        //     "deploy",
-                        //     `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${Settings.getAddress()} --wasm="${folder}/output/${contractName}.wasm" --payable --payableBySC --readable`
-                        // );
+
+                        panel.webview.postMessage({
+                            command: "txResult",
+                            data: {
+                                result,
+                            },
+                        });
                     }
                 }
             },
