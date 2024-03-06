@@ -8,6 +8,7 @@ import { Settings } from "./settings";
 import * as storage from "./storage";
 import { ProcessFacade, sleep } from "./utils";
 import { FreeTextVersion, Version } from "./version";
+import fetch from "node-fetch";
 import path = require("path");
 import fs = require("fs");
 
@@ -651,6 +652,35 @@ export async function cleanContract(folder: string) {
         await runInTerminal("build", `${getKscPath()} all clean --path "${folder}"`);
     } catch (error: any) {
         throw new Error("Could not clean Smart Contract", { cause: error });
+    }
+}
+
+export async function generateNewAccount() {
+    try {
+        await runInTerminal("Generate New Account", `${getKoperatorPath()} account create`);
+    } catch (error: any) {
+        throw new Error("Could not generate a new account", { cause: error });
+    }
+}
+
+export async function getFaucet() {
+    const url = `https://api.testnet.klever.finance/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
+    const options = {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    };
+
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        await runInTerminal("Get Faucet", `echo "${JSON.stringify(data, null, 2)}"`);
+    } catch (error: any) {
+        throw new Error("Could not request test KLV", { cause: error });
     }
 }
 

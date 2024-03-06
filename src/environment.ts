@@ -11,7 +11,6 @@ export class Environment {
     }
 
     static getNode(): string {
-        console.log("TEST saporraaaaa");
         return process.env["KLEVER_NODE"] || "https://node.devnet.klever.finance";
     }
 }

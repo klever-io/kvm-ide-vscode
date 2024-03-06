@@ -40,6 +40,8 @@ export async function activate(context: vscode.ExtensionContext) {
         manageContract(context, "upgrade", contract)
     );
 
+    vscode.commands.registerCommand("kleverchain.generateNewAccount", async () => await generateNewAccount());
+    vscode.commands.registerCommand("kleverchain.getFaucet", async () => await getFaucet());
     vscode.commands.registerCommand("kleverchain.runScenarios", runScenarios);
     vscode.commands.registerCommand("kleverchain.runFreshLocalnet", runFreshLocalnet);
     vscode.commands.registerCommand("kleverchain.resumeExistingLocalnet", resumeExistingLocalnet);
@@ -159,6 +161,22 @@ async function cleanContract(contract: any) {
     try {
         let folder = getContractFolder(contract);
         await sdk.cleanContract(folder);
+    } catch (error) {
+        await onTopLevelError(error);
+    }
+}
+
+async function generateNewAccount() {
+    try {
+        await sdk.generateNewAccount();
+    } catch (error) {
+        await onTopLevelError(error);
+    }
+}
+
+async function getFaucet() {
+    try {
+        await sdk.getFaucet();
     } catch (error) {
         await onTopLevelError(error);
     }

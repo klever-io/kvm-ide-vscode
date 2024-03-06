@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+    <path d="M10,4v40h28V12l-8-8H10z M34,15v-3.5L38.5,16H34z M12,42V6h20v10h10v26H12z" fill="#fff"/>
+    <text x="12" y="35" font-family="Arial, sans-serif" font-size="10" fill="#fff">.PEM</text>
+</svg>

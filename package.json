@@ -59,6 +59,24 @@
                 "category": "kleverchain"
             },
             {
+                "command": "kleverchain.generateNewAccount",
+                "title": "Generate New Account PEM file",
+                "category": "kleverchain",
+                "icon": {
+                    "light": "content/light/pem.svg",
+                    "dark": "content/dark/pem.svg"
+                }
+            },
+            {
+                "command": "kleverchain.getFaucet",
+                "title": "Get Test KLV",
+                "category": "kleverchain",
+                "icon": {
+                    "light": "content/light/money.svg",
+                    "dark": "content/dark/money.svg"
+                }
+            },
+            {
                 "command": "kleverchain.refreshContracts",
                 "title": "Refresh",
                 "category": "kleverchain",
@@ -198,6 +216,14 @@
             ],
             "commandPalette": [
                 {
+                    "command": "kleverchain.generateNewAccount",
+                    "when": "false"
+                },
+                {
+                    "command": "kleverchain.getFaucet",
+                    "when": "false"
+                },
+                {
                     "command": "kleverchain.refreshContracts",
                     "when": "false"
                 },
@@ -259,6 +285,16 @@
                 },
                 {
                     "command": "kleverchain.refreshContracts",
+                    "when": "view == kleverSmartContracts",
+                    "group": "navigation"
+                },
+                {
+                    "command": "kleverchain.generateNewAccount",
+                    "when": "view == kleverSmartContracts",
+                    "group": "navigation"
+                },
+                {
+                    "command": "kleverchain.getFaucet",
                     "when": "view == kleverSmartContracts",
                     "group": "navigation"
                 }
@@ -395,5 +431,8 @@
         "webpack": "5.76.3",
         "webpack-cli": "5.0.1"
     },
-    "extensionDependencies": []
+    "extensionDependencies": [],
+    "dependencies": {
+        "node-fetch": "^3.3.2"
+    }
 }
