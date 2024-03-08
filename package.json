@@ -3,7 +3,7 @@
     "displayName": "KleverChain IDE",
     "description": "KleverChain IDE for developing Smart Contracts",
     "version": "0.21.0",
-    "publisher": "Klever",
+    "publisher": "klever-org",
     "repository": {
         "type": "git",
         "url": "https://github.com/klever-io/kvm-ide-vscode.git"
