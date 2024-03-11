@@ -684,10 +684,12 @@ export async function getFaucet() {
     }
 }
 
-export async function runScenarios(_folder: string) {
+export async function runScenarios(folder: string) {
     try {
-        // await ensureInstalledMxpyGroup("vmtools");
-        // await runInTerminal("scenarios", `run-scenarios "${folder}"`);
+        await runInTerminal(
+            "runScenarios",
+            `KLEVER_NODE=${Settings.getNode()} --key-file=${Settings.getKeyFile()} ${getKoperatorPath()} sc run-scenarios --path "${folder}"`
+        );
     } catch (error: any) {
         throw new Error("Could not run scenarios.", { cause: error });
     }
