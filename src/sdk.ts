@@ -37,6 +37,15 @@ function getKoperatorPath() {
     return path.join(getPath(), "koperator");
 }
 
+function getCmdEnvs() {
+    let cmdEnv = `KLEVER_NODE=${Settings.getNode()}`;
+    if (process.platform === "win32") {
+        cmdEnv = `cmd /C set ${cmdEnv} &&`;
+    }
+
+    return cmdEnv;
+}
+
 function getPrettyPrinterPath() {
     return path.join(getPath(), "multiversx_sc_lldb_pretty_printers.py");
 }
@@ -456,7 +465,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${Settings.getAddress()} ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
                         );
 
@@ -476,7 +485,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
+                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
                             } ${message?.metadata} ${callValue} --await`,
                             true
@@ -513,7 +522,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `KLEVER_NODE=${Settings.getNode()}  ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
+                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
                                 message?.data?.address
                             } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
@@ -683,7 +692,7 @@ export async function runScenarios(folder: string) {
     try {
         await runInTerminal(
             "runScenarios",
-            `KLEVER_NODE=${Settings.getNode()} --key-file=${Settings.getKeyFile()} ${getKoperatorPath()} sc run-scenarios --path "${folder}"`
+            `${getCmdEnvs} ${getKoperatorPath()} sc run-scenarios --path "${folder}" --key-file=${Settings.getKeyFile()}`
         );
     } catch (error: any) {
         throw new Error("Could not run scenarios.", { cause: error });
