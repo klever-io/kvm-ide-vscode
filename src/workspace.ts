@@ -53,7 +53,7 @@ export function getLanguages(): string[] {
 }
 
 export function getMetadataObjects(): ProjectMetadata[] {
-    let pattern = `${getPath()}/**/kleverkapp.json`;
+    let pattern = `${getPath()}/**/kleverkapp.json`.replace(/\\/g, "/"); //replace is here for windows paths and glob
     let paths = glob.sync(pattern, {});
     let result: ProjectMetadata[] = [];
 
