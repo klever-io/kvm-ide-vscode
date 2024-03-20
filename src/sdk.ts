@@ -22,21 +22,17 @@ export function getPath() {
 }
 
 function getKscPath() {
-    // if (process.platform === "win32") {
-    //     return path.join(getPath(), "ksc.exe");
-    // } else {
-    //     return path.join(getPath(), "ksc");
-    // }
+    if (process.platform === "win32") {
+        return path.join(getPath(), "ksc.exe");
+    }
 
     return path.join(getPath(), "ksc");
 }
 
 function getKoperatorPath() {
-    // if (process.platform === "win32") {
-    //     return path.join(getPath(), "koperator.exe");
-    // } else {
-    //     return path.join(getPath(), "koperator");
-    // }
+    if (process.platform === "win32") {
+        return path.join(getPath(), "koperator.exe");
+    }
 
     return path.join(getPath(), "koperator");
 }
@@ -146,16 +142,12 @@ export async function reinstallKsc(version: Version) {
         display: true,
     });
 
-    // let kscUp: string;
-    // if (process.platform === "win32") {
-    //     kscUp = storage.getPathTo("ksc.exe");
-    // } else {
-    //     kscUp = storage.getPathTo("ksc");
-    // }
-
-    // kscUp = kscUp.replace(/ /g, "\\ ");
-
-    const kscUp = storage.getPathTo("ksc");
+    let kscUp: string;
+    if (process.platform === "win32") {
+        kscUp = storage.getPathTo("ksc.exe");
+    } else {
+        kscUp = storage.getPathTo("ksc");
+    }
 
     const kscUpUrl = getKscUpUrl(version);
     await window.withProgress(
@@ -173,9 +165,10 @@ export async function reinstallKsc(version: Version) {
         }
     );
 
-    const kscUpCommand = `"${kscUp}" --help`;
-
-    if (process.platform !== "win32") {
+    let kscUpCommand = `"${kscUp}" --help`;
+    if (process.platform === "win32") {
+        kscUpCommand = `& "${kscUp}" --help`;
+    } else {
         // 0o755 gives the owner read/write/execute permissions, and group and others read/execute permissions
         await fs.promises.chmod(kscUp, 0o755);
     }
@@ -327,16 +320,16 @@ async function reinstallKoperator(version: Version) {
         display: true,
     });
 
-    // let koperatorUp: string;
-    // if (process.platform === "win32") {
-    //     koperatorUp = storage.getPathTo("koperator.exe");
-    // } else {
-    //     koperatorUp = storage.getPathTo("koperator");
-    // }
+    let koperatorUp: string;
+    if (process.platform === "win32") {
+        koperatorUp = storage.getPathTo("koperator.exe");
+    } else {
+        koperatorUp = storage.getPathTo("koperator");
+    }
 
     // koperatorUp = koperatorUp.replace(/ /g, "\\ ");
 
-    const koperatorUp = storage.getPathTo("koperator");
+    // const koperatorUp = storage.getPathTo("koperator");
     const koperatorUpUrl = getKoperatorUpUrl(version);
 
     await window.withProgress(
@@ -354,9 +347,11 @@ async function reinstallKoperator(version: Version) {
         }
     );
 
-    const koperatorCommand = `"${koperatorUp}" --help`;
+    let koperatorCommand = `"${koperatorUp}" --help`;
 
-    if (process.platform !== "win32") {
+    if (process.platform === "win32") {
+        koperatorCommand = `& "${koperatorUp}" --help`;
+    } else {
         // 0o755 gives the owner read/write/execute permissions, and group and others read/execute permissions
         await fs.promises.chmod(koperatorUp, 0o755);
     }
