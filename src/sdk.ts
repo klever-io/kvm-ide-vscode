@@ -465,7 +465,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${Settings.getAddress()} ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${Settings.getAddress()} ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
                         );
 
@@ -485,7 +485,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
                             } ${message?.metadata} ${callValue} --await`,
                             true
@@ -522,7 +522,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
                                 message?.data?.address
                             } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
@@ -692,7 +692,7 @@ export async function runScenarios(folder: string) {
     try {
         await runInTerminal(
             "runScenarios",
-            `${getCmdEnvs} ${getKoperatorPath()} sc run-scenarios --path "${folder}" --key-file=${Settings.getKeyFile()}`
+            `${getCmdEnvs()} ${getKoperatorPath()} sc run-scenarios --path "${folder}" --key-file=${Settings.getKeyFile()}`
         );
     } catch (error: any) {
         throw new Error("Could not run scenarios.", { cause: error });
