@@ -2,7 +2,7 @@
     "name": "vscode-kvm-ide",
     "displayName": "KleverChain IDE",
     "description": "KleverChain IDE for developing Smart Contracts",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "publisher": "klever-org",
     "repository": {
         "type": "git",
@@ -344,7 +344,7 @@
                 },
                 "kleverchain.kleverNode": {
                     "type": "string",
-                    "default": "https://node.devnet.klever.finance"
+                    "default": "https://node.testnet.klever.finance"
                 },
                 "kleverchain.keyFile": {
                     "type": "string",
