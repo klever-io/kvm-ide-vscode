@@ -465,7 +465,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${Settings.getAddress()} ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
                             true
                         );
 
