@@ -5,6 +5,10 @@ import path = require("path");
 // Here, we hardcode the list of templates, in expectation of the new way to get the templates (e.g. via "sc-meta" or directly from a file on GitHub).
 const CONTRACT_TEMPLATES = [
     {
+        name: "empty",
+        language: "rust",
+    },
+    {
         name: "adder",
         language: "rust",
     },
@@ -12,12 +16,9 @@ const CONTRACT_TEMPLATES = [
         name: "crypto-zombies",
         language: "rust",
     },
+
     {
-        name: "empty",
-        language: "rust",
-    },
-    {
-        name: "ping-pong-klv",
+        name: "dice",
         language: "rust",
     },
 ];
