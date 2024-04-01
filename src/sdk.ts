@@ -393,7 +393,7 @@ async function reinstallKoperator(version: Version) {
 
 export async function buildContract(folder: string) {
     try {
-        await runInTerminal("build", `${getKscPath()} all build --path "${folder}" --release`);
+        await runInTerminal("build", `${getKscPath()} all build --path "${folder}"`);
     } catch (error: any) {
         throw new Error("Could not build Smart Contract", { cause: error });
     }
