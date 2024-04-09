@@ -421,6 +421,12 @@ export async function manageContract(context: any, type: string, folder: string)
         const wasmBuffer = fs.readFileSync(`${folder}/output/${wasmName}`);
         const abiBuffer = fs.readFileSync(`${folder}/output/${abiName}`);
 
+        let historyPath = `${folder}/output/history.json`;
+        let history: any[] = [];
+        if (fs.existsSync(historyPath)) {
+            history = JSON.parse(fs.readFileSync(historyPath).toString());
+        }
+
         panel.webview.onDidReceiveMessage(
             async (message) => {
                 if (message.command === "webviewReady") {
@@ -437,6 +443,7 @@ export async function manageContract(context: any, type: string, folder: string)
                                 name: wasmName,
                                 buffer: wasmBuffer.toString("hex"),
                             },
+                            history,
                         },
                     });
                 } else if (message.command === "submitForm") {
@@ -469,10 +476,22 @@ export async function manageContract(context: any, type: string, folder: string)
                             true
                         );
 
+                        const parsedResult = JSON.parse(result);
+
+                        if (parsedResult?.status === "success") {
+                            history.push({
+                                hash: parsedResult.hash,
+                                contractAddress: parsedResult?.receipts?.[1]?.contract || "",
+                            });
+
+                            fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
+                        }
+
                         panel.webview.postMessage({
                             command: "txResult",
                             data: {
                                 result,
+                                history,
                             },
                         });
                     } else if (message?.data?.scType === 0) {
