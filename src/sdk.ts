@@ -541,7 +541,7 @@ export async function cleanContract(folder: string) {
 
 export async function generateNewAccount() {
     try {
-        await runInTerminal("Generate New Account", `${getKoperatorPath()} account create`);
+        await runInTerminal("Generate New Account", `${getKoperatorPath()} account create --key-file=${Settings.getKeyFile()}`);
     } catch (error: any) {
         throw new Error("Could not generate a new account", { cause: error });
     }
