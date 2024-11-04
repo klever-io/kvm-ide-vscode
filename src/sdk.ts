@@ -548,6 +548,14 @@ export async function generateNewAccount() {
 }
 
 export async function getFaucet() {
+    if (!Settings.getAddress()) {
+        Feedback.info({
+            message: "No address is set. Please set an address in the settings.",
+            display: true,
+            modal: true,
+        });
+        return;
+    }
     const url = `https://api.testnet.klever.finance/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
     const options = {
         method: "POST",
@@ -558,6 +566,14 @@ export async function getFaucet() {
 
     try {
         const response = await fetch(url, options);
+        Feedback.debug({
+            message: `Faucet request returned code = ${response.status}`,
+            items: [
+                { label: "URL", detail: url },
+                { label: "Address", detail: Settings.getAddress() },
+                { label: "Response", detail: JSON.stringify(response, null, 2) }
+            ],
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
