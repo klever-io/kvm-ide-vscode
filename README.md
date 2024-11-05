@@ -22,8 +22,8 @@ KleverChain IDE can be installed from the Visual Studio Code Marketplace.
 ### Operating system
 
  - **Linux** is supported
- - **Windows** is supported
  - **MacOS** is supported
+ - **Windows** not officially supported
 
 ### Other dependencies
 
@@ -37,7 +37,7 @@ To install the RUST buildchain and set it up on the nightly version, follow thes
   1. Download and run the installer from [here](https://www.rust-lang.org/pt-BR/tools/install) to install `rustup`, which is the Rust toolchain installer.
   2. After installation, open a command prompt and execute the following command to switch to the nightly version:
      ```bash
-     rustup default nightly
+     rustup default nightly-2024-06-12
      ```
      This command sets the Rust version to nightly globally on your system.
 
@@ -48,7 +48,7 @@ To install the RUST buildchain and set it up on the nightly version, follow thes
      ```
   2. Once `rustup` is installed, switch to the nightly version of Rust by running:
      ```bash
-     rustup default nightly
+     rustup default nightly-2024-06-12
      ```
      This will ensure you are using the nightly toolchain for all Rust projects unless specified otherwise.
 
