@@ -4,3 +4,4 @@ node_modules
 *.vsix
 content/codicons/**
 .DS_Store
+.idea

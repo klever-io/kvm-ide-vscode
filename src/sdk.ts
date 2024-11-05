@@ -6,27 +6,20 @@ import { Feedback } from "./feedback";
 import * as presenter from "./presenter";
 import { Settings } from "./settings";
 import * as storage from "./storage";
-import { ProcessFacade, sleep } from "./utils";
+import { getPlatform, ProcessFacade, sleep } from "./utils";
 import { FreeTextVersion, Version } from "./version";
 import fetch from "node-fetch";
 import path = require("path");
 import fs = require("fs");
+import { Tool } from "./tool";
 
 const DEFAULT_KSC_VERSION = Version.parse("0.43.3");
 const DEFAULT_KOPERATOR_VERSION = Version.parse("1.6.3");
-const LATEST_VERSIONS_URL = "https://storage.googleapis.com/kleverchain-public/versions.json";
-const BASE_STORAGE_URL = "https://storage.googleapis.com/kleverchain-public";
+export const LATEST_VERSIONS_URL = "https://storage.googleapis.com/kleverchain-public/versions.json";
+export const BASE_STORAGE_URL = "https://storage.googleapis.com/kleverchain-public";
 
 export function getPath() {
     return Settings.getSdkPath();
-}
-
-function getKscPath() {
-    if (process.platform === "win32") {
-        return path.join(getPath(), "ksc.exe");
-    }
-
-    return path.join(getPath(), "ksc");
 }
 
 function getKoperatorPath() {
@@ -51,34 +44,21 @@ function getPrettyPrinterPath() {
 }
 
 export async function reinstall() {
-    let latestVersion = await getLatestKnownKscVersion();
-    let version = await presenter.askKscVersion(latestVersion);
+    let ksc = await getKSC();
+    let version = await presenter.askKscVersion(ksc.version);
     if (!version) {
         return;
     }
-
-    await reinstallKsc(version);
+    ksc.setVersion(version);
+    await reinstallTool(ksc);
 }
 
-/**
- * Fetch the latest known version from Github, or fallback to the IDE-configured default version, if the fetch fails.
- */
-async function getLatestKnownKscVersion(): Promise<Version> {
-    try {
-        let response = await axios.get(LATEST_VERSIONS_URL);
-        return Version.parse(response.data.ksc);
-    } catch {
-        return DEFAULT_KSC_VERSION;
-    }
+async function getOperator(): Promise<Tool> {
+    return await Tool.new("koperator", DEFAULT_KOPERATOR_VERSION);
 }
 
-async function getLatestKnownKoperatorVersion(): Promise<Version> {
-    try {
-        let response = await axios.get(LATEST_VERSIONS_URL);
-        return Version.parse(response.data.koperator);
-    } catch {
-        return DEFAULT_KOPERATOR_VERSION;
-    }
+async function getKSC(): Promise<Tool> {
+    return await Tool.new("ksc", DEFAULT_KSC_VERSION);
 }
 
 export async function ensureInstalled() {
@@ -90,46 +70,27 @@ export async function ensureKoperatorInstalled() {
 }
 
 async function ensureKsc() {
-    let isInstalled = await isKscInstalled();
-    if (isInstalled) {
+    let ksc = await getKSC();
+    if (await isInstalled(ksc)) {
         return;
     }
 
-    let latestKscVersion = await getLatestKnownKscVersion();
-    let answer = await presenter.askInstallKsc(latestKscVersion);
+    let answer = await presenter.askInstallKsc(ksc.version);
     if (answer) {
-        await reinstallKsc(latestKscVersion);
+        await reinstallTool(ksc);
     }
 }
 
 async function ensureKoperator() {
-    let isInstalled = await isKoperatorInstalled();
-    if (isInstalled) {
+    let operator = await getOperator();
+    if (await isInstalled(operator)) {
         return;
     }
 
-    let latestKscVersion = await getLatestKnownKoperatorVersion();
-    let answer = await presenter.askInstallKoperator(latestKscVersion);
+    let answer = await presenter.askInstallKoperator(operator.version);
     if (answer) {
-        await reinstallKoperator(latestKscVersion);
+        await reinstallTool(operator);
     }
-}
-
-async function isKscInstalled(exactVersion?: Version): Promise<boolean> {
-    let [cliVersionString, ok] = await getOneLineStdout(getKscPath(), ["--version"]);
-    if (!cliVersionString || !ok) {
-        return false;
-    }
-
-    let installedVersion = Version.parse(cliVersionString);
-
-    if (exactVersion) {
-        return installedVersion.isSameAs(exactVersion);
-    }
-
-    // No exact version specified (desired).
-    let latestKnownVersion = await getLatestKnownKscVersion();
-    return installedVersion.isNewerOrSameAs(latestKnownVersion);
 }
 
 async function getOneLineStdout(program: string, args: string[]): Promise<[string, boolean]> {
@@ -145,105 +106,73 @@ async function getOneLineStdout(program: string, args: string[]): Promise<[strin
     }
 }
 
-export async function reinstallKsc(version: Version) {
+export async function reinstallTool(tool: Tool) {
     Feedback.info({
-        message: "Installation of ksc has been started. Please wait for installation to finish.",
+        message: `Installation of ${tool.name} has been started. Please wait for installation to finish.`,
         display: true,
     });
 
-    let kscUp: string;
-    if (process.platform === "win32") {
-        kscUp = storage.getPathTo("ksc.exe");
-    } else {
-        kscUp = storage.getPathTo("ksc");
-    }
-
-    const kscUpUrl = getKscUpUrl(version);
+    let downloadPath = tool.getDownloadPath();
+    let downloadUrl = tool.getDownloadURL();
+    let dependencies = tool.getDependencies();
     await window.withProgress(
         {
             location: ProgressLocation.Window,
             cancellable: false,
-            title: "Downloading: Ksc",
+            title: `Downloading: ${tool.name}`,
         },
         async (progress) => {
             progress.report({ increment: 0 });
 
-            await downloadFile(kscUp, kscUpUrl);
+            await downloadFile(downloadPath, downloadUrl);
+            for(let dependency of dependencies) {
+                await downloadFile(dependency.getDownloadPath(), dependency.getDownloadURL());
+            }
 
             progress.report({ increment: 100 });
         }
     );
 
-    let kscUpCommand = `"${kscUp}" --help`;
+    let toolCommand = `"${downloadPath}" --help`;
     if (process.platform === "win32") {
-        kscUpCommand = `& "${kscUp}" --help`;
+        toolCommand = `& "${downloadPath}" --help`;
     } else {
         // 0o755 gives the owner read/write/execute permissions, and group and others read/execute permissions
-        await fs.promises.chmod(kscUp, 0o755);
+        await fs.promises.chmod(downloadPath, 0o755);
+        for(let dependency of dependencies) {
+            await fs.promises.chmod(dependency.getDownloadPath(), 0o755);
+        }
     }
 
-    await runInTerminal("installer", kscUpCommand);
+    await runInTerminal("installer", toolCommand);
 
     // Determine the target path for ksc
-    const targetPath = getKscPath();
-
-    // Ensure the target directory exists
+    const targetPath = tool.getSDKPath();
     await fs.promises.mkdir(path.dirname(targetPath), { recursive: true });
-
-    // Copy the file in a cross-platform way
-    await fs.promises.copyFile(kscUp, targetPath);
+    await fs.promises.copyFile(downloadPath, targetPath);
+    for(let dependency of dependencies) {
+        await fs.promises.copyFile(dependency.getDownloadPath(), dependency.getSDKPath());
+    }
 
     do {
         Feedback.debug({
             message: "Waiting for the installer to finish.",
         });
         await sleep(5000);
-    } while (!(await isKscInstalled(version)));
+    } while (!(await isInstalled(tool)));
 
     await Feedback.info({
         message:
-            "ksc has been installed. Please close all Visual Studio Code terminals and then reopen them (as needed).",
+            `${tool.name} has been installed. Please close all Visual Studio Code terminals and then reopen them (as needed).`,
         display: true,
         modal: true,
     });
 }
 
-function getKscUpUrl(version: Version) {
-    switch (process.platform) {
-        case "win32":
-            return `${BASE_STORAGE_URL}/ksc/win32/${version.vValue}/ksc.exe`;
-        case "darwin":
-            if (process.arch === "arm64") {
-                return `${BASE_STORAGE_URL}/ksc/darwin-arm64/${version.vValue}/ksc`;
-            }
-            return `${BASE_STORAGE_URL}/ksc/darwin/${version.vValue}/ksc`;
-        case "linux":
-            return `${BASE_STORAGE_URL}/ksc/linux/${version.vValue}/ksc`;
-        default:
-            return `platform not supported`;
-    }
-}
-
-function getKoperatorUpUrl(version: Version) {
-    switch (process.platform) {
-        case "win32":
-            return `${BASE_STORAGE_URL}/koperator/win32/${version.vValue}/koperator.exe`;
-        case "darwin":
-            if (process.arch === "arm64") {
-                return `${BASE_STORAGE_URL}/koperator/darwin-arm64/${version.vValue}/koperator`;
-            }
-            return `${BASE_STORAGE_URL}/koperator/darwin/${version.vValue}/koperator`;
-        case "linux":
-            return `${BASE_STORAGE_URL}/koperator/linux/${version.vValue}/koperator`;
-        default:
-            return `platform not supported`;
-    }
-}
-
 export async function newFromTemplate(folder: string, template: string, name: string) {
     try {
         await ProcessFacade.execute({
-            program: getKscPath(),
+            program: Tool.cli("ksc").getSDKPath(),
             args: ["new", "--path", folder, "--template", template, "--name", name],
         });
 
@@ -308,92 +237,24 @@ async function killRunningInTerminal(name: string) {
     terminal.sendText("\u0003");
 }
 
-async function isKoperatorInstalled(): Promise<boolean> {
-    let [_, ok] = await getOneLineStdout(getKoperatorPath(), ["--version"]);
+async function isInstalled(tool: Tool): Promise<boolean> {
+    let [_, ok] = await getOneLineStdout(tool.getSDKPath(), ["--version"]);
     return ok;
 }
 
 export async function reinstallKoperatorModule(): Promise<void> {
-    let latestVersion = await getLatestKnownKoperatorVersion();
-    let version = await presenter.askKoperatorVersion(latestVersion);
+    let operator = await getOperator();
+    let version = await presenter.askKoperatorVersion(operator.version);
     if (!version) {
         return;
     }
-
-    await reinstallKoperator(version);
-}
-
-async function reinstallKoperator(version: Version) {
-    Feedback.info({
-        message: `Installation of koperator has been started. Please wait for installation to finish.`,
-        display: true,
-    });
-
-    let koperatorUp: string;
-    if (process.platform === "win32") {
-        koperatorUp = storage.getPathTo("koperator.exe");
-    } else {
-        koperatorUp = storage.getPathTo("koperator");
-    }
-
-    // koperatorUp = koperatorUp.replace(/ /g, "\\ ");
-
-    // const koperatorUp = storage.getPathTo("koperator");
-    const koperatorUpUrl = getKoperatorUpUrl(version);
-
-    await window.withProgress(
-        {
-            location: ProgressLocation.Window,
-            cancellable: false,
-            title: "Downloading: Koperator",
-        },
-        async (progress) => {
-            progress.report({ increment: 0 });
-
-            await downloadFile(koperatorUp, koperatorUpUrl);
-
-            progress.report({ increment: 100 });
-        }
-    );
-
-    let koperatorCommand = `"${koperatorUp}" --help`;
-
-    if (process.platform === "win32") {
-        koperatorCommand = `& "${koperatorUp}" --help`;
-    } else {
-        // 0o755 gives the owner read/write/execute permissions, and group and others read/execute permissions
-        await fs.promises.chmod(koperatorUp, 0o755);
-    }
-
-    await runInTerminal("installer", koperatorCommand);
-
-    // Determine the target path for ksc
-    const targetPath = getKoperatorPath();
-
-    // Ensure the target directory exists
-    await fs.promises.mkdir(path.dirname(targetPath), { recursive: true });
-
-    // Copy the file in a cross-platform way
-    await fs.promises.copyFile(koperatorUp, targetPath);
-
-    do {
-        Feedback.debug({
-            message: "Waiting for the installer to finish.",
-        });
-
-        await sleep(5000);
-    } while (!(await isKoperatorInstalled()));
-
-    await Feedback.info({
-        message: `Koperator has been installed.`,
-        display: true,
-        modal: true,
-    });
+    operator.setVersion(version);
+    await reinstallTool(operator);
 }
 
 export async function buildContract(folder: string) {
     try {
-        await runInTerminal("build", `${getKscPath()} all build --path "${folder}"`);
+        await runInTerminal("build", `${Tool.cli("ksc").getSDKPath()} all build --path "${folder}"`);
     } catch (error: any) {
         throw new Error("Could not build Smart Contract", { cause: error });
     }
@@ -672,7 +533,7 @@ function getPropertiesFlags(propertiesString: string): string {
 
 export async function cleanContract(folder: string) {
     try {
-        await runInTerminal("build", `${getKscPath()} all clean --path "${folder}"`);
+        await runInTerminal("build", `${Tool.cli("ksc").getSDKPath()} all clean --path "${folder}"`);
     } catch (error: any) {
         throw new Error("Could not clean Smart Contract", { cause: error });
     }
@@ -680,13 +541,21 @@ export async function cleanContract(folder: string) {
 
 export async function generateNewAccount() {
     try {
-        await runInTerminal("Generate New Account", `${getKoperatorPath()} account create`);
+        await runInTerminal("Generate New Account", `${getKoperatorPath()} account create --key-file=${Settings.getKeyFile()}`);
     } catch (error: any) {
         throw new Error("Could not generate a new account", { cause: error });
     }
 }
 
 export async function getFaucet() {
+    if (!Settings.getAddress()) {
+        Feedback.info({
+            message: "No address is set. Please set an address in the settings.",
+            display: true,
+            modal: true,
+        });
+        return;
+    }
     const url = `https://api.testnet.klever.finance/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
     const options = {
         method: "POST",
@@ -697,6 +566,14 @@ export async function getFaucet() {
 
     try {
         const response = await fetch(url, options);
+        Feedback.debug({
+            message: `Faucet request returned code = ${response.status}`,
+            items: [
+                { label: "URL", detail: url },
+                { label: "Address", detail: Settings.getAddress() },
+                { label: "Response", detail: JSON.stringify(response, null, 2) }
+            ],
+        });
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

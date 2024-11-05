@@ -74,3 +74,19 @@ export class ProcessFacade {
 export async function sleep(milliseconds: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
+
+export function getPlatform() {
+    switch (process.platform) {
+        case "win32":
+            return "win32";
+        case "darwin":
+            if (process.arch === "arm64") {
+                return "darwin-arm64";
+            }
+            return "darwin";
+        case "linux":
+            return "linux";
+        default:
+            return "platform not supported";
+    }
+}
