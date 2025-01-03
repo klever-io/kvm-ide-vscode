@@ -12,7 +12,7 @@ import path = require("path");
 import fs = require("fs");
 
 export async function activate(context: vscode.ExtensionContext) {
-    Feedback.debug({ message: "KleverChain extension activated." });
+    Feedback.debug({ message: "Klever Blockchain extension activated." });
 
     Root.ExtensionContext = context;
 
@@ -65,7 +65,7 @@ export async function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-    Feedback.debug({ message: "KleverChain extension deactivated." });
+    Feedback.debug({ message: "Klever Blockchain extension deactivated." });
 }
 
 async function setupWorkspace() {

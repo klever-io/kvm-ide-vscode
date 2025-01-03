@@ -33,7 +33,7 @@ export async function askContractName() {
 
 export async function askInstallKsc(requiredVersion: Version): Promise<boolean> {
     let answer =
-        await askYesNo(`KleverChain IDE requires ksc ${requiredVersion}, which isn't available in your environment.
+        await askYesNo(`Klever Blockchain IDE requires ksc ${requiredVersion}, which isn't available in your environment.
 Do you agree to install it?`);
     return answer;
 }
@@ -58,7 +58,7 @@ export async function askKscVersion(defaultVersion: Version): Promise<Version> {
 
 export async function askInstallKoperator(requiredVersion: Version): Promise<boolean> {
     let answer =
-        await askYesNo(`KleverChain IDE requires koperator ${requiredVersion}, which isn't available in your environment.
+        await askYesNo(`Klever Blockchain IDE requires koperator ${requiredVersion}, which isn't available in your environment.
     Do you agree to install it?`);
     return answer;
 }
