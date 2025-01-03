@@ -119,6 +119,15 @@ Then, from Visual Studio Code open the command menu via `Ctrl+Shift+P` and run `
 
 You will be prompted for the repository, branch and path for the pretty printer script. Simply leave the options blank in order to install the latest version of the script from mx-sdk-rs. -->
 
+## Useful Links
+
+- [Klever Blockchain](https://klever.org/)
+- [Klever Blockchain Forum](https://forum.klever.org/c/kleverchain/developers)
+- [Klever Blockchain Documentation](https://docs.klever.org/welcome-to-the-Klever-Blockchain-documentation-website)
+- [Klever Blockchain IDE on Github](https://github.com/klever-io/kvm-ide-vscode/issues)
+- [Klever Blockchain IDE on Visual Studio Code Marketplace](https://marketplace.visualstudio.com/items?itemName=Klever-org.vscode-kvm-ide)
+- [Klever Wallet](https://klever.io/)
+
 ## Contributors
 
 ### How to publish an update of the extension
