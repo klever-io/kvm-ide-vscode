@@ -56,7 +56,7 @@ To install the RUST buildchain and set it up on the nightly version, follow thes
 
 Using the nightly version of Rust allows access to the most current Rust features and optimizations. Some features required by Klever Blockchain Smart Contracts are only available in the nightly Rust channel. It is crucial for developers to be on this version to ensure compatibility and leverage the latest advancements in the Rust ecosystem.
 
-If you experience any issues during the installation or while setting Rust to the nightly version, please let us know [on Github](https://github.com/klever-io/kvm-ide-vscode/issues), on [Slack](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw), or [on the Forum](https://forum.klever.org/c/kleverchain/developers).
+If you experience any issues during the installation or while setting Rust to the nightly version, please let us know [on Github](https://github.com/klever-io/kvm-ide-vscode/issues), or [on the Forum](https://forum.klever.org/c/kleverchain/developers).
 
 
 ### [ksc](https://github.com/klever-io/klever-vm-sdk-rs)
