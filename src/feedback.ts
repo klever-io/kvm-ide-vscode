@@ -44,7 +44,7 @@ export class Feedback {
         if (options.display) {
             const message = `${withoutEndingPeriod(
                 options.message
-            )}. To see more details, pick "kleverchain" in vscode's "Output" panels.`;
+            )}. To see more details, pick "Klever Blockchain" in vscode's "Output" panels.`;
             const messageOptions: vscode.MessageOptions = {};
             await vscode.window.showErrorMessage(message, messageOptions, "Got it!");
         }
@@ -56,7 +56,7 @@ export class Feedback {
     }
 
     private static getChannel(): vscode.OutputChannel {
-        const channelName = `KleverChain`;
+        const channelName = `Klever Blockchain`;
 
         if (!this.outputChannels[channelName]) {
             this.outputChannels[channelName] = vscode.window.createOutputChannel(channelName);
