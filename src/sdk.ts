@@ -556,7 +556,7 @@ export async function getFaucet() {
         });
         return;
     }
-    const url = `https://api.testnet.klever.finance/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
+    const url = `https://api.testnet.klever.org/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
     const options = {
         method: "POST",
         headers: {

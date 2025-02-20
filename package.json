@@ -344,7 +344,7 @@
                 },
                 "kleverchain.kleverNode": {
                     "type": "string",
-                    "default": "https://node.testnet.klever.finance"
+                    "default": "https://node.testnet.klever.org"
                 },
                 "kleverchain.keyFile": {
                     "type": "string",

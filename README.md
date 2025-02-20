@@ -89,7 +89,7 @@ To tailor the Klever Blockchain IDE extension to your development needs, you can
   - **Default**: `~/klever-sdk`
 
 - `kleverchain.kleverNode`: Sets the URL of the KleverNode you wish to connect to. This is crucial for deploying and testing your smart contracts.
-  - **Default**: `https://node.devnet.klever.finance`
+  - **Default**: `https://node.testnet.klever.org`
 
 - `kleverchain.keyFile`: Defines the path to your wallet key file. This file is necessary for signing transactions and deploying contracts.
   - **Default**: `~/klever-sdk/walletKey.pem`

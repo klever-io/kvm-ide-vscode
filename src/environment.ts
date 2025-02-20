@@ -11,6 +11,6 @@ export class Environment {
     }
 
     static getNode(): string {
-        return process.env["KLEVER_NODE"] || "https://node.devnet.klever.finance";
+        return process.env["KLEVER_NODE"] || "https://node.testnet.klever.org";
     }
 }
