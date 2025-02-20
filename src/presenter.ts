@@ -31,11 +31,14 @@ export async function askContractName() {
     return result;
 }
 
-export async function askInstallKsc(requiredVersion: Version): Promise<boolean> {
-    let answer =
-        await askYesNo(`Klever Blockchain IDE requires ksc ${requiredVersion}, which isn't available in your environment.
-Do you agree to install it?`);
-    return answer;
+export async function askInstallKsc(requiredVersion: Version, installed: boolean): Promise<boolean> {
+    let prompt = `Klever Blockchain IDE requires ksc ${requiredVersion}, which isn't available in your environment.
+Do you agree to install it?`
+    if (installed) {
+        prompt = `Klever Blockchain IDE found a new version for ksc, ${requiredVersion}, which isn't available in your environment.
+Do you agree to install it?`
+    }
+    return await askYesNo(prompt);
 }
 
 export async function askKscVersion(defaultVersion: Version): Promise<Version> {
@@ -56,11 +59,14 @@ export async function askKscVersion(defaultVersion: Version): Promise<Version> {
     return Version.parse(result);
 }
 
-export async function askInstallKoperator(requiredVersion: Version): Promise<boolean> {
-    let answer =
-        await askYesNo(`Klever Blockchain IDE requires koperator ${requiredVersion}, which isn't available in your environment.
-    Do you agree to install it?`);
-    return answer;
+export async function askInstallKoperator(requiredVersion: Version, installed: boolean): Promise<boolean> {
+    let prompt = `Klever Blockchain IDE requires koperator ${requiredVersion}, which isn't available in your environment.
+Do you agree to install it?`
+    if (installed) {
+        prompt = `Klever Blockchain IDE found a new version for koperator, ${requiredVersion}, which isn't available in your environment.
+Do you agree to install it?`
+    }
+    return await askYesNo(prompt);
 }
 
 export async function askKoperatorVersion(defaultVersion: Version): Promise<Version> {
