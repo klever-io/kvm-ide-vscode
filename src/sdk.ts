@@ -333,7 +333,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
                             true
                         );
 
@@ -367,7 +367,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         const result = await Feedback.runCommandAndCaptureOutput(
                             `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
-                            } ${message?.metadata} ${callValue} --await`,
+                            } ${message?.metadata} ${callValue} --await --sign`,
                             true
                         );
 
@@ -404,7 +404,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         const result = await Feedback.runCommandAndCaptureOutput(
                             `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
                                 message?.data?.address
-                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
                             true
                         );
 
