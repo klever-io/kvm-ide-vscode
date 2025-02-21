@@ -71,11 +71,12 @@ export async function ensureKoperatorInstalled() {
 
 async function ensureKsc() {
     let ksc = await getKSC();
-    if (await isInstalled(ksc)) {
+    let [installed, version] = await isInstalled(ksc);
+    if (installed && version.isNewerOrSameAs(ksc.version)) {
         return;
     }
 
-    let answer = await presenter.askInstallKsc(ksc.version);
+    let answer = await presenter.askInstallKsc(ksc.version, installed);
     if (answer) {
         await reinstallTool(ksc);
     }
@@ -83,11 +84,12 @@ async function ensureKsc() {
 
 async function ensureKoperator() {
     let operator = await getOperator();
-    if (await isInstalled(operator)) {
+    let [installed, version] = await isInstalled(operator);
+    if (installed && version.isNewerOrSameAs(operator.version)) {
         return;
     }
 
-    let answer = await presenter.askInstallKoperator(operator.version);
+    let answer = await presenter.askInstallKoperator(operator.version, installed);
     if (answer) {
         await reinstallTool(operator);
     }
@@ -154,12 +156,14 @@ export async function reinstallTool(tool: Tool) {
         await fs.promises.copyFile(dependency.getDownloadPath(), dependency.getSDKPath());
     }
 
+    let [installed, _] = await isInstalled(tool);
     do {
         Feedback.debug({
             message: "Waiting for the installer to finish.",
         });
         await sleep(5000);
-    } while (!(await isInstalled(tool)));
+        [installed, _] = await isInstalled(tool);
+    } while (!installed);
 
     await Feedback.info({
         message:
@@ -237,9 +241,16 @@ async function killRunningInTerminal(name: string) {
     terminal.sendText("\u0003");
 }
 
-async function isInstalled(tool: Tool): Promise<boolean> {
-    let [_, ok] = await getOneLineStdout(tool.getSDKPath(), ["--version"]);
-    return ok;
+async function isInstalled(tool: Tool): Promise<[boolean, Version]> {
+    let [result, ok] = await getOneLineStdout(tool.getSDKPath(), ["--version"]);
+    let version = Version.parse("0.0.0");
+    if (ok) {
+        let matches = Array.from(result.matchAll(/(\d{1,2}\.\d{1,2}\.\d{1,3})/gm), m => m[1]);
+        if (matches.length > 0) {
+            version = Version.parse(matches[0]);
+        }
+    }
+    return [ok, version];
 }
 
 export async function reinstallKoperatorModule(): Promise<void> {
@@ -333,7 +344,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         }
 
                         const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
                             true
                         );
 
@@ -367,7 +378,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         const result = await Feedback.runCommandAndCaptureOutput(
                             `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
                                 message?.data?.address
-                            } ${message?.metadata} ${callValue} --await`,
+                            } ${message?.metadata} ${callValue} --await --sign`,
                             true
                         );
 
@@ -404,7 +415,7 @@ export async function manageContract(context: any, type: string, folder: string)
                         const result = await Feedback.runCommandAndCaptureOutput(
                             `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
                                 message?.data?.address
-                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await`,
+                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
                             true
                         );
 
@@ -556,7 +567,7 @@ export async function getFaucet() {
         });
         return;
     }
-    const url = `https://api.testnet.klever.finance/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
+    const url = `https://api.testnet.klever.org/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
     const options = {
         method: "POST",
         headers: {

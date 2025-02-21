@@ -59,12 +59,17 @@ Using the nightly version of Rust allows access to the most current Rust feature
 If you experience any issues during the installation or while setting Rust to the nightly version, please let us know [on Github](https://github.com/klever-io/kvm-ide-vscode/issues), or [on the Forum](https://forum.klever.org/c/kleverchain/developers).
 
 
-### [ksc](https://github.com/klever-io/klever-vm-sdk-rs)
+### Tools
 
-**ksc** is the backend of the Visual Studio Code extension. **ksc** is **required** by the Klever Blockchain IDE. In order to install it, please follow [these steps](https://docs.klever.org). The extension, via `ksc`, will automatically download its external dependencies, so you do not have to worry much about setting up the development environment. These automatically installed dependencies include:
+The Klever blockchain IDE automatically downloads the necessary tools when you first run the extension. These tools include:
 
 * `Klever Operator` buildchain
 * `VM Tools` (e.g. tests / scenarios framework)
+
+If you need to manually download these tools, you can do so by running the following command in your VSCode Command Palette (View -> Command Palette): `kleverchain: Setup Workspace`
+
+_Tip: You can also run this command to update the tools to the latest version._
+
 
 ## Extension Commands
 
@@ -89,7 +94,7 @@ To tailor the Klever Blockchain IDE extension to your development needs, you can
   - **Default**: `~/klever-sdk`
 
 - `kleverchain.kleverNode`: Sets the URL of the KleverNode you wish to connect to. This is crucial for deploying and testing your smart contracts.
-  - **Default**: `https://node.devnet.klever.finance`
+  - **Default**: `https://node.testnet.klever.org`
 
 - `kleverchain.keyFile`: Defines the path to your wallet key file. This file is necessary for signing transactions and deploying contracts.
   - **Default**: `~/klever-sdk/walletKey.pem`
@@ -106,8 +111,20 @@ To customize these settings for your development environment, follow these steps
 3. In the search bar at the top, type `kleverchain` to filter out the settings related to the Klever Blockchain IDE.
 4. You will see the settings listed above. Click on the edit icon next to each setting you wish to change and enter your desired value.
 
-By configuring these settings, you can ensure that the Klever Blockchain IDE extension works seamlessly with your development setup and preferences. If you need further assistance or have suggestions for additional settings, please reach out to us [on Github](https://github.com/klever-io/kvm-ide-vscode/issues), on [Slack](https://join.slack.com/t/klever-blockchain/shared_invite/zt-1z69ikw0g-dXtRY7eGTnyRllsCV_YGOw), or [on the Forum](https://forum.klever.org/c/kleverchain/developers).
+By configuring these settings, you can ensure that the Klever Blockchain IDE extension works seamlessly with your development setup and preferences. If you need further assistance or have suggestions for additional settings, please reach out to us [on Github](https://github.com/klever-io/kvm-ide-vscode/issues) or [on the Forum](https://forum.klever.org/c/kleverchain/developers).
 
+
+## Starting a new project
+
+You can start a new project using the **Template** tab in the **Extension View** or load an existing project folder.
+
+### **Important Reminder**
+After loading or starting a new project, always run the following commands in the **root of your project folder**:
+
+```bash
+rustup override set nightly-2024-06-12
+rustup target add wasm32-unknown-unknown
+```
 
 <!-- ## Installing the rust debugger pretty printer script
 

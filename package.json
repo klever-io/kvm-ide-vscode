@@ -2,7 +2,7 @@
     "name": "vscode-kvm-ide",
     "displayName": "Klever Blockchain IDE",
     "description": "Klever Blockchain IDE for developing Smart Contracts",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "publisher": "klever-org",
     "repository": {
         "type": "git",
@@ -344,7 +344,7 @@
                 },
                 "kleverchain.kleverNode": {
                     "type": "string",
-                    "default": "https://node.testnet.klever.finance"
+                    "default": "https://node.testnet.klever.org"
                 },
                 "kleverchain.keyFile": {
                     "type": "string",
