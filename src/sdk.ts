@@ -474,7 +474,7 @@ function getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri): s
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Klever Extension</title>
             <link href="${styleUri}" rel="stylesheet" />
-            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'nonce-${nonce}'; connect-src https://klever.finance https://*.klever.finance;">
+            <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'nonce-${nonce}'; connect-src https://klever.org https://*.klever.org;">
 
         </head>
         <body>
