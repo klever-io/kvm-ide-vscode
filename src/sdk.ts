@@ -8,7 +8,7 @@ import { Settings } from "./settings";
 import * as storage from "./storage";
 import { getPlatform, ProcessFacade, sleep } from "./utils";
 import { FreeTextVersion, Version } from "./version";
-import fetch from "node-fetch";
+import { fetchWithDebugging, createUserFriendlyErrorMessage } from "./fetch-utility";
 import path = require("path");
 import fs = require("fs");
 import { Tool } from "./tool";
@@ -567,32 +567,61 @@ export async function getFaucet() {
         });
         return;
     }
-    const url = `https://api.testnet.klever.org/v1.0/transaction/send-user-funds/${Settings.getAddress()}`;
-    const options = {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
+    
+    const address = Settings.getAddress();
+    const url = `https://api.testnet.klever.org/v1.0/transaction/send-user-funds/${address}`;
+    
+    await window.withProgress(
+        {
+            location: ProgressLocation.Window,
+            cancellable: false,
+            title: "Requesting faucet funds...",
         },
-    };
+        async (progress) => {
+            progress.report({ increment: 0 });
+            
+            try {
+                const data = await fetchWithDebugging(
+                    url,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    },
+                    {
+                        operation: "faucet",
+                        url: url,
+                        additionalContext: {
+                            address: address
+                        }
+                    }
+                );
 
-    try {
-        const response = await fetch(url, options);
-        Feedback.debug({
-            message: `Faucet request returned code = ${response.status}`,
-            items: [
-                { label: "URL", detail: url },
-                { label: "Address", detail: Settings.getAddress() },
-                { label: "Response", detail: JSON.stringify(response, null, 2) }
-            ],
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+                if (data.code && data.code === "successful") {
+                    Feedback.info({
+                        message: "Test KLV has been sent to your address",
+                        display: true,
+                    });
+                }
+                progress.report({ increment: 100 });
+                
+            } catch (error: any) {
+                progress.report({ increment: 100 });
+                
+                if (error.message && error.message.includes("faucet already been used")) {
+                    Feedback.info({
+                        message: "You have already used the faucet today. Please try again after 24 hours.",
+                        display: true,
+                    });
+                    return;
+                }
+                
+                const userMessage = createUserFriendlyErrorMessage(error, "Could not request test KLV");
+                throw new Error(userMessage, { cause: error });
+            }
         }
-        const data = await response.json();
-        await runInTerminal("Get Faucet", `echo "${JSON.stringify(data, null, 2)}"`);
-    } catch (error: any) {
-        throw new Error("Could not request test KLV", { cause: error });
-    }
+    );
 }
 
 export async function runScenarios(folder: string) {
