@@ -271,6 +271,115 @@ export async function buildContract(folder: string) {
     }
 }
 
+async function managedDeploy(message: any, history: any, panel: any, historyPath: any) {
+    const metadata: string[] = message.metadata.split("@");
+
+    if (metadata.length < 3) {
+        throw new Error("Invalid metadata");
+    }
+
+    let customMetadata = "";
+    if (metadata.length > 3) {
+        //discard binary blob, vmType and properties as it will be loaded automatically from the file by the koperator
+        customMetadata = metadata.slice(3).join("@");
+        customMetadata = "@" + customMetadata;
+    }
+
+    let propertiesFlags = getPropertiesFlags(metadata[2]);
+
+    let callValue = "";
+    if (message?.data?.callValue) {
+        for (const key in message.data.callValue) {
+            callValue += `--values ${key}=${message.data.callValue[key]} `;
+        }
+    }
+
+    const result = await Feedback.runCommandAndCaptureOutput(
+        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
+        true
+    );
+
+    const parsedResult = JSON.parse(result);
+
+    if (parsedResult?.status === "success") {
+        history.push({
+            hash: parsedResult.hash,
+            contractAddress: parsedResult?.receipts?.[1]?.contract || "",
+        });
+
+        fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
+    }
+
+    panel.webview.postMessage({
+        command: "txResult",
+        data: {
+            result,
+            history,
+        },
+    });
+}
+
+async function managedInvoke(message: any, panel: any) {
+    let callValue = "";
+    if (message?.data?.callValue) {
+        for (const key in message.data.callValue) {
+            callValue += `--values ${key}=${message.data.callValue[key]} `;
+        }
+    }
+
+    const result = await Feedback.runCommandAndCaptureOutput(
+        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
+            message?.data?.address
+        } ${message?.metadata} ${callValue} --await --sign`,
+        true
+    );
+
+    panel.webview.postMessage({
+        command: "txResult",
+        data: {
+            result,
+        },
+    });
+}
+
+async function managedUpgrade(message: any, folder: any, contractName: any, panel: any) {
+    const metadata: string[] = message.metadata.split("@");
+
+    if (metadata.length < 3) {
+        throw new Error("Invalid metadata");
+    }
+
+    let customMetadata = "";
+    if (metadata.length > 3) {
+        //discard binary blob, vmType and properties as it will be loaded automatically from the file by the koperator
+        customMetadata = metadata.slice(3).join("@");
+        customMetadata = "@" + customMetadata;
+    }
+
+    let propertiesFlags = getPropertiesFlags(metadata[2]);
+
+    let callValue = "";
+    if (message?.data?.callValue) {
+        for (const key in message.data.callValue) {
+            callValue += `--values ${key}=${message.data.callValue[key]} `;
+        }
+    }
+
+    const result = await Feedback.runCommandAndCaptureOutput(
+        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
+            message?.data?.address
+        } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
+        true
+    );
+
+    panel.webview.postMessage({
+        command: "txResult",
+        data: {
+            result,
+        },
+    });
+}
+
 export async function manageContract(context: any, type: string, folder: string) {
     try {
         const panel = vscode.window.createWebviewPanel(
@@ -321,110 +430,13 @@ export async function manageContract(context: any, type: string, folder: string)
                 } else if (message.command === "submitForm") {
                     if (message?.data?.scType === 1) {
                         //Deploy
-                        const metadata: string[] = message.metadata.split("@");
-
-                        if (metadata.length < 3) {
-                            throw new Error("Invalid metadata");
-                        }
-
-                        let customMetadata = "";
-                        if (metadata.length > 3) {
-                            //discard binary blob, vmType and properties as it will be loaded automatically from the file by the koperator
-                            customMetadata = metadata.slice(3).join("@");
-                            customMetadata = "@" + customMetadata;
-                        }
-
-                        let propertiesFlags = getPropertiesFlags(metadata[2]);
-
-                        let callValue = "";
-                        if (message?.data?.callValue) {
-                            for (const key in message.data.callValue) {
-                                callValue += `--values ${key}=${message.data.callValue[key]} `;
-                            }
-                        }
-
-                        const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
-                            true
-                        );
-
-                        const parsedResult = JSON.parse(result);
-
-                        if (parsedResult?.status === "success") {
-                            history.push({
-                                hash: parsedResult.hash,
-                                contractAddress: parsedResult?.receipts?.[1]?.contract || "",
-                            });
-
-                            fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
-                        }
-
-                        panel.webview.postMessage({
-                            command: "txResult",
-                            data: {
-                                result,
-                                history,
-                            },
-                        });
+                        managedDeploy(message, history, panel, historyPath);
                     } else if (message?.data?.scType === 0) {
                         //Invoke
-                        let callValue = "";
-                        if (message?.data?.callValue) {
-                            for (const key in message.data.callValue) {
-                                callValue += `--values ${key}=${message.data.callValue[key]} `;
-                            }
-                        }
-
-                        const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
-                                message?.data?.address
-                            } ${message?.metadata} ${callValue} --await --sign`,
-                            true
-                        );
-
-                        panel.webview.postMessage({
-                            command: "txResult",
-                            data: {
-                                result,
-                            },
-                        });
+                        managedInvoke(message, panel)
                     } else if (message?.data?.scType === 2) {
                         //Upgrade
-                        const metadata: string[] = message.metadata.split("@");
-
-                        if (metadata.length < 3) {
-                            throw new Error("Invalid metadata");
-                        }
-
-                        let customMetadata = "";
-                        if (metadata.length > 3) {
-                            //discard binary blob, vmType and properties as it will be loaded automatically from the file by the koperator
-                            customMetadata = metadata.slice(3).join("@");
-                            customMetadata = "@" + customMetadata;
-                        }
-
-                        let propertiesFlags = getPropertiesFlags(metadata[2]);
-
-                        let callValue = "";
-                        if (message?.data?.callValue) {
-                            for (const key in message.data.callValue) {
-                                callValue += `--values ${key}=${message.data.callValue[key]} `;
-                            }
-                        }
-
-                        const result = await Feedback.runCommandAndCaptureOutput(
-                            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
-                                message?.data?.address
-                            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
-                            true
-                        );
-
-                        panel.webview.postMessage({
-                            command: "txResult",
-                            data: {
-                                result,
-                            },
-                        });
+                        managedUpgrade(message, folder, contractName, panel)
                     }
                 }
             },
