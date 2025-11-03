@@ -271,7 +271,7 @@ export async function buildContract(folder: string) {
     }
 }
 
-async function managedDeploy(message: any, history: any, panel: any, historyPath: any) {
+async function managedDeploy(message: any, history: any, panel: any, historyPath: any, folder: any, contractName: any) {
     const metadata: string[] = message.metadata.split("@");
 
     if (metadata.length < 3) {
@@ -294,17 +294,26 @@ async function managedDeploy(message: any, history: any, panel: any, historyPath
         }
     }
 
-    const result = await Feedback.runCommandAndCaptureOutput(
-        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
-        true
-    );
+    let result = "";
+    let failed = false;
+    let contractAddress = "";
+    try {
+        result = await Feedback.runCommandAndCaptureOutput(
+            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc create ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
+            true
+        );
+    } catch (error: any) {
+        result = error.message;
+        failed = true;
+    }
 
     const parsedResult = JSON.parse(result);
 
     if (parsedResult?.status === "success") {
+        contractAddress = parsedResult?.receipts?.[1]?.contract || "";
         history.push({
             hash: parsedResult.hash,
-            contractAddress: parsedResult?.receipts?.[1]?.contract || "",
+            contractAddress,
         });
 
         fs.writeFileSync(historyPath, JSON.stringify(history, null, 2));
@@ -315,6 +324,8 @@ async function managedDeploy(message: any, history: any, panel: any, historyPath
         data: {
             result,
             history,
+            failed,
+            deployedAddress: contractAddress,
         },
     });
 }
@@ -327,17 +338,25 @@ async function managedInvoke(message: any, panel: any) {
         }
     }
 
-    const result = await Feedback.runCommandAndCaptureOutput(
-        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
-            message?.data?.address
-        } ${message?.metadata} ${callValue} --await --sign`,
-        true
-    );
+    let result = "";
+    let failed = false;
+    try {
+        result = await Feedback.runCommandAndCaptureOutput(
+            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc invoke ${
+                message?.data?.address
+            } ${message?.metadata} ${callValue} --await --sign`,
+            true
+        );
+    } catch (error: any) {
+        result = error.message;
+        failed = true;
+    }
 
     panel.webview.postMessage({
         command: "txResult",
         data: {
             result,
+            failed,
         },
     });
 }
@@ -365,17 +384,25 @@ async function managedUpgrade(message: any, folder: any, contractName: any, pane
         }
     }
 
-    const result = await Feedback.runCommandAndCaptureOutput(
-        `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
-            message?.data?.address
-        } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
-        true
-    );
+    let result = "";
+    let failed = false;
+    try {
+        result = await Feedback.runCommandAndCaptureOutput(
+            `${getCmdEnvs()} ${getKoperatorPath()} --key-file=${Settings.getKeyFile()} sc upgrade ${
+                message?.data?.address
+            } ${customMetadata} ${propertiesFlags} ${callValue} --wasm="${folder}/output/${contractName}.wasm" --await --sign`,
+            true
+        );
+    } catch (error: any) {
+        result = error.message;
+        failed = true;
+    }
 
     panel.webview.postMessage({
         command: "txResult",
         data: {
             result,
+            failed,
         },
     });
 }
@@ -430,13 +457,13 @@ export async function manageContract(context: any, type: string, folder: string)
                 } else if (message.command === "submitForm") {
                     if (message?.data?.scType === 1) {
                         //Deploy
-                        managedDeploy(message, history, panel, historyPath);
+                        managedDeploy(message, history, panel, historyPath, folder, contractName);
                     } else if (message?.data?.scType === 0) {
                         //Invoke
-                        managedInvoke(message, panel)
+                        managedInvoke(message, panel);
                     } else if (message?.data?.scType === 2) {
                         //Upgrade
-                        managedUpgrade(message, folder, contractName, panel)
+                        managedUpgrade(message, folder, contractName, panel);
                     }
                 }
             },
