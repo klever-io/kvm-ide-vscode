@@ -185,7 +185,7 @@ export async function newFromTemplate(folder: string, template: string, name: st
             display: true,
         });
     } catch (error: any) {
-        throw new Error("Could not create Smart Contract", { cause: error });
+        throw new Error(`Could not create Smart Contract: ${error.message}`, { cause: error });
     }
 }
 
@@ -267,7 +267,7 @@ export async function buildContract(folder: string) {
     try {
         await runInTerminal("build", `${Tool.cli("ksc").getSDKPath()} all build --path "${folder}"`);
     } catch (error: any) {
-        throw new Error("Could not build Smart Contract", { cause: error });
+        throw new Error(`Could not build Smart Contract: ${error.message}`, { cause: error });
     }
 }
 
@@ -444,7 +444,7 @@ export async function manageContract(context: any, type: string, folder: string)
             context.subscriptions
         );
     } catch (error: any) {
-        throw new Error("Could not build Smart Contract", { cause: error });
+        throw new Error(`Could not build Smart Contract: ${error.message}`, { cause: error });
     }
 }
 
@@ -558,7 +558,7 @@ export async function cleanContract(folder: string) {
     try {
         await runInTerminal("build", `${Tool.cli("ksc").getSDKPath()} all clean --path "${folder}"`);
     } catch (error: any) {
-        throw new Error("Could not clean Smart Contract", { cause: error });
+        throw new Error(`Could not clean Smart Contract: ${error.message}`, { cause: error });
     }
 }
 
@@ -566,7 +566,7 @@ export async function generateNewAccount() {
     try {
         await runInTerminal("Generate New Account", `${getKoperatorPath()} account create --key-file=${Settings.getKeyFile()}`);
     } catch (error: any) {
-        throw new Error("Could not generate a new account", { cause: error });
+        throw new Error(`Could not generate a new account: ${error.message}`, { cause: error });
     }
 }
 
@@ -643,7 +643,7 @@ export async function runScenarios(folder: string) {
             `${getCmdEnvs()} ${getKoperatorPath()} sc run-scenarios --path "${folder}" --key-file=${Settings.getKeyFile()}`
         );
     } catch (error: any) {
-        throw new Error("Could not run scenarios.", { cause: error });
+        throw new Error(`Could not run scenarios: ${error.message}`, { cause: error });
     }
 }
 
@@ -656,7 +656,7 @@ export async function runFreshLocalnet(localnetToml: Uri) {
         // await runInTerminal('localnet', `${getMxpyPath()} localnet setup`, null, folder);
         // await runInTerminal('localnet', `${getMxpyPath()} localnet start`);
     } catch (error: any) {
-        throw new Error("Could not start localnet.", { cause: error });
+        throw new Error(`Could not start localnet: ${error.message}`, { cause: error });
     }
 }
 
@@ -675,7 +675,7 @@ export async function stopLocalnet(_localnetToml: Uri) {
     try {
         await killRunningInTerminal("localnet");
     } catch (error: any) {
-        throw new Error("Could not start localnet.", { cause: error });
+        throw new Error(`Could not stop localnet: ${error.message}`, { cause: error });
     }
 }
 
@@ -739,7 +739,7 @@ async function downloadRawData(url: string): Promise<string> {
     try {
         let response = await axios.get(url, { responseType: "arraybuffer" });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         throw new Error(`Failed to download ${url}\n${error}`);
     }
 }
